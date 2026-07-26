@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050709" />
+      <stop offset="60%" stop-color="#0A0E14" />
+      <stop offset="100%" stop-color="#001838" />
+    </linearGradient>
+    <linearGradient id="blueGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0066FF" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#00C8FF" stop-opacity="0.2" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark Canvas Background -->
+  <rect width="1200" height="500" fill="url(#bgGrad)"/>
+
+  <!-- Electric Blue Wave & Mesh Lines in Background (Right side) -->
+  <g opacity="0.35">
+    <path d="M 600,500 C 750,380 900,420 1200,280 L 1200,500 Z" fill="url(#blueGlow)" />
+    <path d="M 650,500 C 800,320 950,380 1200,200 L 1200,500 Z" fill="none" stroke="#0066FF" stroke-width="2" />
+    <path d="M 620,500 C 780,300 920,350 1200,150" fill="none" stroke="#00A3FF" stroke-width="1.5" />
+    <path d="M 700,500 C 850,250 1000,300 1200,100" fill="none" stroke="#0066FF" stroke-width="1" />
+    <path d="M 750,500 C 900,200 1050,220 1200,50" fill="none" stroke="#00C8FF" stroke-width="1.5" />
+  </g>
+
+  <!-- LEFT BRANDING SECTION -->
+  <g transform="translate(60, 90)">
+    <!-- Circular Icon -->
+    <g transform="translate(0, 0)">
+      <circle cx="75" cy="75" r="68" fill="#0A0D10" stroke="#FFFFFF" stroke-width="8"/>
+      <!-- Lifter -->
+      <circle cx="75" cy="48" r="9" fill="#FFFFFF"/>
+      <path d="M 68,61 L 82,61 L 80,88 L 70,88 Z" fill="#FFFFFF"/>
+      <rect x="67" y="90" width="6.5" height="38" rx="3" fill="#FFFFFF"/>
+      <rect x="76.5" y="90" width="6.5" height="38" rx="3" fill="#FFFFFF"/>
+      <path d="M 69,63 L 50,32 M 81,63 L 100,32" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/>
+      <line x1="30" y1="30" x2="120" y2="30" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+      <rect x="36" y="18" width="5" height="24" rx="1" fill="#FFFFFF"/>
+      <rect x="43" y="22" width="3" height="16" rx="1" fill="#FFFFFF"/>
+      <rect x="109" y="18" width="5" height="24" rx="1" fill="#FFFFFF"/>
+      <rect x="104" y="22" width="3" height="16" rx="1" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Header Text -->
+    <text x="170" y="70" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="800" font-size="54" fill="#FFFFFF" letter-spacing="-1">HUMAN V1</text>
+    <text x="172" y="115" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="700" font-size="28" fill="#0066FF" letter-spacing="12" filter="url(#glow)">STRENGTH</text>
+
+    <!-- Tagline -->
+    <line x1="172" y1="135" x2="520" y2="135" stroke="#0066FF" stroke-width="2" stroke-opacity="0.8"/>
+    <text x="172" y="162" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="600" font-size="15" fill="#E2E8F0" letter-spacing="5">TRAIN. TRACK. TRANSFORM.</text>
+  </g>
+
+  <!-- 4 FEATURE PILLS AT BOTTOM -->
+  <g transform="translate(60, 360)">
+    <!-- Pill 1: Log Workouts -->
+    <g transform="translate(0, 0)">
+      <rect width="180" height="52" rx="26" fill="rgba(18, 21, 25, 0.85)" stroke="rgba(0, 102, 255, 0.4)" stroke-width="1.5"/>
+      <circle cx="30" cy="26" r="16" fill="#0066FF"/>
+      <!-- Barbell Icon -->
+      <path d="M 22,26 L 38,26 M 24,21 L 24,31 M 36,21 L 36,31" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+      <text x="56" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="10" fill="#FFFFFF" letter-spacing="1">LOG</text>
+      <text x="56" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="10" fill="#94A3B8" letter-spacing="1">WORKOUTS</text>
+    </g>
+
+    <!-- Pill 2: Track Progress -->
+    <g transform="translate(195, 0)">
+      <rect width="180" height="52" rx="26" fill="rgba(18, 21, 25, 0.85)" stroke="rgba(0, 102, 255, 0.4)" stroke-width="1.5"/>
+      <circle cx="30" cy="26" r="16" fill="#0066FF"/>
+      <!-- Trending Up Icon -->
+      <path d="M 21,31 L 27,24 L 31,27 L 38,20 M 33,20 L 38,20 L 38,25" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="56" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="10" fill="#FFFFFF" letter-spacing="1">TRACK</text>
+      <text x="56" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="10" fill="#94A3B8" letter-spacing="1">PROGRESS</text>
+    </g>
+
+    <!-- Pill 3: Stay Consistent -->
+    <g transform="translate(390, 0)">
+      <rect width="180" height="52" rx="26" fill="rgba(18, 21, 25, 0.85)" stroke="rgba(0, 102, 255, 0.4)" stroke-width="1.5"/>
+      <circle cx="30" cy="26" r="16" fill="#0066FF"/>
+      <!-- Target Icon -->
+      <circle cx="30" cy="26" r="9" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+      <circle cx="30" cy="26" r="3" fill="#FFFFFF"/>
+      <text x="56" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="10" fill="#FFFFFF" letter-spacing="1">STAY</text>
+      <text x="56" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="10" fill="#94A3B8" letter-spacing="1">CONSISTENT</text>
+    </g>
+
+    <!-- Pill 4: Achieve More -->
+    <g transform="translate(585, 0)">
+      <rect width="180" height="52" rx="26" fill="rgba(18, 21, 25, 0.85)" stroke="rgba(0, 102, 255, 0.4)" stroke-width="1.5"/>
+      <circle cx="30" cy="26" r="16" fill="#0066FF"/>
+      <!-- Trophy Icon -->
+      <path d="M 24,20 L 36,20 L 36,27 C 36,30 33,32 30,32 C 27,32 24,30 24,27 Z M 30,32 L 30,36 M 26,36 L 34,36" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <text x="56" y="24" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="10" fill="#FFFFFF" letter-spacing="1">ACHIEVE</text>
+      <text x="56" y="36" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="10" fill="#94A3B8" letter-spacing="1">MORE</text>
+    </g>
+  </g>
+
+  <!-- RIGHT ATHLETE SILHOUETTE & BARBELL GRAPHIC -->
+  <g transform="translate(860, 80)">
+    <!-- Glowing Aura Rings behind athlete -->
+    <ellipse cx="140" cy="200" rx="120" ry="160" fill="none" stroke="#0066FF" stroke-width="1.5" stroke-dasharray="8,6" opacity="0.6"/>
+    <ellipse cx="140" cy="200" rx="150" ry="190" fill="none" stroke="#00A3FF" stroke-width="1" opacity="0.3"/>
+
+    <!-- Athlete Silhouette (Muscular back squat) -->
+    <!-- Head -->
+    <circle cx="140" cy="110" r="22" fill="#0D131C" stroke="#2A303A" stroke-width="2"/>
+    <!-- Traps & Shoulders -->
+    <path d="M 90,150 Q 140,130 190,150 L 195,240 Q 140,260 85,240 Z" fill="#0F1722" stroke="#0066FF" stroke-width="2" />
+    <!-- Muscular back details -->
+    <path d="M 140,140 L 140,240 M 115,160 Q 140,175 165,160 M 110,190 Q 140,205 170,190" stroke="#0066FF" stroke-width="1.5" fill="none" opacity="0.7"/>
+
+    <!-- Barbell Across Back -->
+    <rect x="-40" y="132" width="360" height="14" rx="3" fill="#1C2026" stroke="#FFFFFF" stroke-width="2" />
+    <line x1="-50" y1="139" x2="370" y2="139" stroke="#00C8FF" stroke-width="2" filter="url(#glow)"/>
+
+    <!-- Left Heavy Weight Plates -->
+    <rect x="-30" y="95" width="16" height="88" rx="3" fill="#121519" stroke="#FFFFFF" stroke-width="2.5"/>
+    <rect x="-10" y="105" width="12" height="68" rx="2" fill="#0A0D10" stroke="#0066FF" stroke-width="2"/>
+    <rect x="5" y="112" width="8" height="54" rx="2" fill="#0A0D10" stroke="#0066FF" stroke-width="1.5"/>
+
+    <!-- Right Heavy Weight Plates -->
+    <rect x="295" y="95" width="16" height="88" rx="3" fill="#121519" stroke="#FFFFFF" stroke-width="2.5"/>
+    <rect x="278" y="105" width="12" height="68" rx="2" fill="#0A0D10" stroke="#0066FF" stroke-width="2"/>
+    <rect x="267" y="112" width="8" height="54" rx="2" fill="#0A0D10" stroke="#0066FF" stroke-width="1.5"/>
+
+    <!-- Athlete Hands grasping barbell -->
+    <rect x="50" y="130" width="22" height="18" rx="4" fill="#FFFFFF" />
+    <rect x="208" y="130" width="22" height="18" rx="4" fill="#FFFFFF" />
+  </g>
+</svg>

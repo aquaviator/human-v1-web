@@ -1,0 +1,6 @@
+{
+  "name": "Human",
+  "description": "Public marketing and product promotional website for the Human app ecosystem and Human Ontology.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
