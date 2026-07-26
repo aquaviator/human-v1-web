@@ -21,6 +21,18 @@ function human_register_rest_routes() {
         'callback' => 'human_rest_get_ontology_summary',
         'permission_callback' => '__return_true',
     ));
+
+    register_rest_route('human/v1', '/journal', array(
+        'methods'  => 'GET',
+        'callback' => 'human_rest_get_journal',
+        'permission_callback' => '__return_true',
+    ));
+
+    register_rest_route('human/v1', '/seo', array(
+        'methods'  => 'GET',
+        'callback' => 'human_rest_get_seo',
+        'permission_callback' => '__return_true',
+    ));
 }
 add_action('rest_api_init', 'human_register_rest_routes');
 
@@ -31,6 +43,23 @@ function human_rest_get_apps() {
         'brand' => 'Human',
         'domain' => 'humanv1.com',
         'data' => $apps
+    ), 200);
+}
+
+function human_rest_get_journal() {
+    $articles = function_exists('human_get_cornerstone_articles') ? human_get_cornerstone_articles() : array();
+    return new WP_REST_Response(array(
+        'success' => true,
+        'count' => count($articles),
+        'data' => $articles
+    ), 200);
+}
+
+function human_rest_get_seo() {
+    $meta = function_exists('human_get_seo_metadata') ? human_get_seo_metadata() : array();
+    return new WP_REST_Response(array(
+        'success' => true,
+        'metadata' => $meta
     ), 200);
 }
 

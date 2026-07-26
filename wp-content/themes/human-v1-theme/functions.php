@@ -42,6 +42,20 @@ function human_v1_theme_scripts() {
 add_action('wp_enqueue_scripts', 'human_v1_theme_scripts');
 
 /**
+ * Custom Title Filter for Native SEO Engine
+ */
+function human_custom_document_title($title) {
+    if (function_exists('human_get_seo_metadata')) {
+        $meta = human_get_seo_metadata();
+        if (!empty($meta['title'])) {
+            return $meta['title'];
+        }
+    }
+    return $title;
+}
+add_filter('pre_get_document_title', 'human_custom_document_title', 20);
+
+/**
  * Human App Status Badge Markup Helper
  */
 function human_get_status_badge($status) {

@@ -42,10 +42,10 @@ This platform communicates the unified "One Human" brand vision, showcases the *
 
 ### B. Theme File Hierarchy (`wp-content/themes/human-v1-theme`)
 - `style.css` — Theme headers & master CSS custom properties.
-- `functions.php` — Theme initialization, asset enqueueing, block editor support, SVG handling, and metadata helpers.
+- `functions.php` — Theme initialization, asset enqueueing, block editor support, SVG handling, and native SEO integration.
 - `header.php` — Universal responsive header with navigation & logo.
 - `footer.php` — Footer layout with legal, navigation, and brand statement.
-- `front-page.php` — Homepage layout with hero, product intro, platform grid, Ontology preview, offline-first philosophy, and Journal highlights.
+- `front-page.php` — Homepage layout fetching canonical apps and journal articles dynamically.
 - `page-apps.php` — Complete Human Apps catalogue (`/apps`).
 - `page-strength.php` — Product marketing page for Human Strength (`/strength`).
 - `page-ontology.php` — Major editorial marketing page for Human Ontology (`/ontology`).
@@ -57,12 +57,16 @@ This platform communicates the unified "One Human" brand vision, showcases the *
 - `page-contact.php` — Contact form & inquiry details (`/contact`).
 - `home.php` — Human Journal archive page (`/journal`).
 - `single.php` — Journal single post view.
+- `404.php` — Custom 404 error template.
 - `page.php` — Fallback page template.
 
 ### C. Plugin Architecture (`wp-content/plugins/human-platform`)
-- Registers `human_app` Custom Post Type with status taxonomy (`Available`, `In Development`, `Coming Soon`, `Planned`).
-- Provides REST API extension points (`/wp-json/human/v1/...`).
-- Reserves extension hooks for future `human-marketing` plugin (Buffer-style social publication queue, campaigns, CTA library, and UTM tracking).
+- **Custom Post Types:** `human_app` (Ecosystem apps with status, pricing, app ID, target URL) and `human_cta` (Reusable conversion CTAs).
+- **SEO Engine (`inc/seo-engine.php`):** Lightweight, zero-dependency SEO metadata generator (<title>, meta description, canonical link, Open Graph, Twitter Cards, and JSON-LD structured data for Organization, WebSite, BlogPosting, SoftwareApplication, and BreadcrumbList).
+- **Admin Settings (`inc/admin-settings.php`):** Central settings panel under WordPress Admin for global brand settings, social share default image, and fallback metadata.
+- **Meta Boxes (`inc/meta-boxes.php`):** Custom post/page meta fields for SEO titles, descriptions, target search intent, primary CTA selections, and commercial app parameters.
+- **Seed Data (`inc/seed-data.php`):** Auto-seeding logic for 10 cornerstone launch articles, default ecosystem apps, and reusable CTAs upon plugin activation.
+- **REST API (`inc/rest-api.php`):** Exposes `/wp-json/human/v1/apps`, `/wp-json/human/v1/journal`, `/wp-json/human/v1/ontology/summary`, and `/wp-json/human/v1/seo`.
 
 ---
 
@@ -90,9 +94,10 @@ This platform communicates the unified "One Human" brand vision, showcases the *
 
 ---
 
-## 5. Implementation Roadmap
+## 5. Implementation Roadmap Status
+
 1. [x] Architectural definition and `PROJECT-STATUS.md` updated.
-2. [ ] Build complete `human-platform` WordPress plugin (`wp-content/plugins/human-platform/`).
-3. [ ] Build complete `human-v1-theme` WordPress theme (`wp-content/themes/human-v1-theme/`).
-4. [ ] Build Node/Express dev preview bridge (`server.ts`) to serve the live theme interface in AI Studio preview.
-5. [ ] Provide complete `README.md` with deployment, database structure, and WordPress administration guide.
+2. [x] Built complete `human-platform` WordPress plugin with CPTs, SEO Engine, Meta Boxes, Admin UI, and Seed Data (`wp-content/plugins/human-platform/`).
+3. [x] Built complete `human-v1-theme` WordPress theme (`wp-content/themes/human-v1-theme/`).
+4. [x] Built Node/Express dev preview bridge (`server.ts`) with full SEO tags, Open Graph, 10 cornerstone articles, dynamic `/sitemap.xml`, `/robots.txt`, and REST API endpoints.
+5. [x] Provided complete `README.md` with deployment, database structure, and WordPress administration guide.
