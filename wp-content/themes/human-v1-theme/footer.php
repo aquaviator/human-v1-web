@@ -57,9 +57,9 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
 
-        <div class="footer-bottom">
+        <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--human-border-dark);">
             <div>&copy; <?php echo date('Y'); ?> Human Performance Technology. All rights reserved.</div>
-            <div style="display: flex; gap: 1.5rem;">
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
                 <a href="<?php echo esc_url(home_url('/privacy')); ?>" style="color: #64748B;">Privacy</a>
                 <a href="<?php echo esc_url(home_url('/terms')); ?>" style="color: #64748B;">Terms</a>
                 <a href="<?php echo esc_url(home_url('/data-deletion')); ?>" style="color: #64748B;">Data Deletion</a>

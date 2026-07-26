@@ -10,11 +10,11 @@ get_header();
 
 <main class="site-main">
     <!-- HERO -->
-    <section style="padding: 5rem 0 4rem; background: linear-gradient(180deg, rgba(0,102,255,0.15) 0%, rgba(10,13,16,1) 100%); border-bottom: 1px solid var(--human-border-dark);">
+    <section class="section-padding" style="background: linear-gradient(180deg, rgba(0,102,255,0.15) 0%, rgba(10,13,16,1) 100%); border-bottom: 1px solid var(--human-border-dark);">
         <div class="container" style="max-width: 900px; text-align: center;">
             <span class="eyebrow">MAJOR HUMAN PROGRAMME</span>
             <h1 class="display-title" style="margin-bottom: 1.25rem;">Human Ontology</h1>
-            <p style="font-size: 1.25rem; color: #94A3B8; margin-bottom: 2rem; line-height: 1.6;">
+            <p style="font-size: clamp(1rem, 2.5vw, 1.25rem); color: #94A3B8; margin-bottom: 2rem; line-height: 1.6;">
                 A structured exercise knowledge system designed to understand movements, equipment, anatomy, biomechanics, substitutions, and training context across the entire Human platform.
             </p>
             <div style="background: rgba(0,102,255,0.08); border: 1px solid rgba(0,102,255,0.3); border-radius: 12px; padding: 1.25rem 2rem; display: inline-block; font-size: 0.95rem; color: var(--human-white);">
@@ -24,9 +24,9 @@ get_header();
     </section>
 
     <!-- WHY ORDINARY LIBRARIES ARE LIMITED -->
-    <section style="padding: 5rem 0; border-bottom: 1px solid var(--human-border-dark);">
+    <section class="section-padding" style="border-bottom: 1px solid var(--human-border-dark);">
         <div class="container">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+            <div class="grid-2col">
                 <div>
                     <span class="eyebrow">THE ARCHITECTURAL DIFFERENCE</span>
                     <h2 class="section-title">Beyond Flat Exercise Lists</h2>
@@ -38,7 +38,7 @@ get_header();
                     </p>
                 </div>
 
-                <div style="background: var(--human-dark-surface); border: 1px solid var(--human-border-dark); border-radius: 16px; padding: 2rem;">
+                <div class="card-padding" style="background: var(--human-dark-surface); border: 1px solid var(--human-border-dark); border-radius: 16px;">
                     <h3 style="font-size: 1.1rem; color: var(--human-white); margin-bottom: 1.5rem;">Ontology Coverage Dimensions</h3>
                     <ul style="list-style: none; display: flex; flex-direction: column; gap: 1rem;">
                         <li style="border-bottom: 1px solid var(--human-border-dark); padding-bottom: 0.75rem;">
@@ -60,11 +60,11 @@ get_header();
     </section>
 
     <!-- FUTURE PLATFORM INTEGRATION -->
-    <section style="padding: 5rem 0; background: var(--human-dark-surface);">
+    <section class="section-padding" style="background: var(--human-dark-surface);">
         <div class="container" style="text-align: center; max-width: 800px;">
             <span class="eyebrow">ECOSYSTEM INTEGRATION</span>
             <h2 class="section-title">Built Once. Used Across Human.</h2>
-            <p style="font-size: 1.1rem; color: #94A3B8; margin-bottom: 3rem;">
+            <p style="font-size: 1.05rem; color: #94A3B8; margin-bottom: 2.5rem; line-height: 1.6;">
                 The Human Ontology serves as the single source of truth for exercise intelligence across Human Strength, Human HIIT, Human Mobility, and future Human Coach AI engines.
             </p>
             <a href="<?php echo esc_url(home_url('/apps')); ?>" class="btn btn-primary">View Ecosystem Applications</a>

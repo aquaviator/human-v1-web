@@ -8,15 +8,15 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<main class="site-main" style="padding: 5rem 0;">
+<main class="site-main section-padding">
     <div class="container" style="max-width: 800px;">
         <span class="eyebrow">TERMS & CONDITIONS</span>
         <h1 class="display-title" style="margin-bottom: 1.5rem;">Terms of Service</h1>
-        <p style="color: #64748B; font-family: var(--font-mono); font-size: 0.9rem; margin-bottom: 2.5rem;">
+        <p style="color: #64748B; font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 2rem; word-break: break-all;">
             Effective Date: July 26, 2026 | Domain: humanv1.com
         </p>
 
-        <div style="color: #94A3B8; font-size: 1rem; line-height: 1.7; display: flex; flex-direction: column; gap: 1.75rem;">
+        <div style="color: #94A3B8; font-size: 0.95rem; line-height: 1.7; display: flex; flex-direction: column; gap: 1.5rem;">
             <p>
                 Welcome to humanv1.com. By accessing our website or utilizing applications in the Human ecosystem (including Human Strength), you agree to these Terms of Service.
             </p>

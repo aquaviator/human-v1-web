@@ -25,19 +25,61 @@ if (!defined('ABSPATH')) {
             <span>Human</span>
         </a>
 
-        <nav>
-            <ul class="main-nav">
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle Navigation Menu">
+            <span class="hamburger-icon">
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+                <span class="hamburger-bar"></span>
+            </span>
+            <span>Menu</span>
+        </button>
+
+        <nav id="primaryNav" aria-label="Primary Navigation">
+            <ul class="main-nav" id="mainNavList">
                 <li><a href="<?php echo esc_url(home_url('/')); ?>">Home</a></li>
                 <li><a href="<?php echo esc_url(home_url('/apps')); ?>">Apps</a></li>
                 <li><a href="<?php echo esc_url(home_url('/ontology')); ?>">Human Ontology</a></li>
                 <li><a href="<?php echo esc_url(home_url('/journal')); ?>">Journal</a></li>
                 <li><a href="<?php echo esc_url(home_url('/about')); ?>">About</a></li>
                 <li><a href="<?php echo esc_url(home_url('/support')); ?>">Support</a></li>
+                <li class="mobile-cta-item">
+                    <a href="<?php echo esc_url(home_url('/strength')); ?>" class="btn btn-primary mobile-cta-btn">Explore Human Strength</a>
+                </li>
             </ul>
         </nav>
 
-        <div>
+        <div class="header-cta">
             <a href="<?php echo esc_url(home_url('/strength')); ?>" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;">Human Strength</a>
         </div>
     </div>
 </header>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('mobileNavToggle');
+    const mainNav = document.getElementById('mainNavList');
+    if (!toggleBtn || !mainNav) return;
+
+    toggleBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', !expanded);
+        mainNav.classList.toggle('is-open');
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!mainNav.contains(e.target) && !toggleBtn.contains(e.target)) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            mainNav.classList.remove('is-open');
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mainNav.classList.contains('is-open')) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            mainNav.classList.remove('is-open');
+            toggleBtn.focus();
+        }
+    });
+});
+</script>

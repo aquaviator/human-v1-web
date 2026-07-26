@@ -8,15 +8,15 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<main class="site-main" style="padding: 5rem 0;">
+<main class="site-main section-padding">
     <div class="container" style="max-width: 800px;">
         <span class="eyebrow">LEGAL COMPLIANCE</span>
         <h1 class="display-title" style="margin-bottom: 1.5rem;">Privacy Policy</h1>
-        <p style="color: #64748B; font-family: var(--font-mono); font-size: 0.9rem; margin-bottom: 2.5rem;">
+        <p style="color: #64748B; font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 2rem; word-break: break-all;">
             Effective Date: July 26, 2026 | Domain: humanv1.com
         </p>
 
-        <div style="color: #94A3B8; font-size: 1rem; line-height: 1.7; display: flex; flex-direction: column; gap: 1.75rem;">
+        <div style="color: #94A3B8; font-size: 0.95rem; line-height: 1.7; display: flex; flex-direction: column; gap: 1.5rem;">
             <p>
                 Human Performance Technology ("Human", "we", "our") respects your privacy. This Privacy Policy describes how we collect, store, and process data across humanv1.com and the Human application ecosystem, including Human Strength (App ID: <code>com.aistudio.humanstrength.kfqjza</code>).
             </p>
