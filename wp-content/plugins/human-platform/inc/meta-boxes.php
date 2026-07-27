@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 function human_add_custom_meta_boxes() {
-    $screens = array('post', 'page', 'human_app');
+    $screens = array('page', 'human_app');
     
     foreach ($screens as $screen) {
         add_meta_box(
@@ -80,6 +80,10 @@ function human_render_app_details_meta_box($post) {
     $app_status  = get_post_meta($post->ID, '_human_app_status', true);
     $package_id  = get_post_meta($post->ID, '_human_app_package_id', true);
     $pricing     = get_post_meta($post->ID, '_human_app_pricing', true);
+    $price_amount = get_post_meta($post->ID, '_human_app_price_amount', true);
+    $price_currency = get_post_meta($post->ID, '_human_app_price_currency', true) ?: 'GBP';
+    $billing_period = get_post_meta($post->ID, '_human_app_billing_period', true) ?: 'year';
+    $trial_days   = get_post_meta($post->ID, '_human_app_trial_days', true) ?: '30';
     $play_url    = get_post_meta($post->ID, '_human_app_play_url', true);
     $cta_label   = get_post_meta($post->ID, '_human_app_cta_label', true);
     $cta_target  = get_post_meta($post->ID, '_human_app_target_url', true);
@@ -99,8 +103,30 @@ function human_render_app_details_meta_box($post) {
             <input type="text" id="human_app_package_id" name="_human_app_package_id" value="<?php echo esc_attr($package_id); ?>" class="widefat" placeholder="e.g. com.aistudio.humanstrength.kfqjza">
         </div>
         <div>
-            <label for="human_app_pricing"><strong><?php _e('Pricing & Trial Copy', 'human-platform'); ?></strong></label>
+            <label for="human_app_pricing"><strong><?php _e('Display Pricing & Trial Copy', 'human-platform'); ?></strong></label>
             <input type="text" id="human_app_pricing" name="_human_app_pricing" value="<?php echo esc_attr($pricing); ?>" class="widefat" placeholder="e.g. 30-day introductory trial, then £24/year">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px;">
+            <div>
+                <label for="human_app_price_amount"><small>Amount</small></label>
+                <input type="number" step="0.01" id="human_app_price_amount" name="_human_app_price_amount" value="<?php echo esc_attr($price_amount); ?>" class="widefat" placeholder="24.00">
+            </div>
+            <div>
+                <label for="human_app_price_currency"><small>Currency</small></label>
+                <input type="text" id="human_app_price_currency" name="_human_app_price_currency" value="<?php echo esc_attr($price_currency); ?>" class="widefat" placeholder="GBP">
+            </div>
+            <div>
+                <label for="human_app_billing_period"><small>Billing Period</small></label>
+                <select id="human_app_billing_period" name="_human_app_billing_period" class="widefat">
+                    <option value="year" <?php selected($billing_period, 'year'); ?>>Year</option>
+                    <option value="month" <?php selected($billing_period, 'month'); ?>>Month</option>
+                    <option value="one_time" <?php selected($billing_period, 'one_time'); ?>>One-time</option>
+                </select>
+            </div>
+            <div>
+                <label for="human_app_trial_days"><small>Trial Days</small></label>
+                <input type="number" id="human_app_trial_days" name="_human_app_trial_days" value="<?php echo esc_attr($trial_days); ?>" class="widefat" placeholder="30">
+            </div>
         </div>
         <div>
             <label for="human_app_play_url"><strong><?php _e('Google Play Listing URL', 'human-platform'); ?></strong></label>
@@ -137,7 +163,11 @@ function human_save_meta_boxes($post_id) {
     }
 
     if (isset($_POST['human_app_meta_nonce']) && wp_verify_nonce($_POST['human_app_meta_nonce'], 'human_app_meta_nonce_action')) {
-        $app_fields = array('_human_app_status', '_human_app_package_id', '_human_app_pricing', '_human_app_play_url', '_human_app_cta_label', '_human_app_target_url');
+        $app_fields = array(
+            '_human_app_status', '_human_app_package_id', '_human_app_pricing', 
+            '_human_app_price_amount', '_human_app_price_currency', '_human_app_billing_period', '_human_app_trial_days',
+            '_human_app_play_url', '_human_app_cta_label', '_human_app_target_url'
+        );
         foreach ($app_fields as $field) {
             if (isset($_POST[$field])) {
                 if ($field === '_human_app_play_url') {

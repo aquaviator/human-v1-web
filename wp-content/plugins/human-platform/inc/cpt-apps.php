@@ -109,6 +109,10 @@ function human_get_canonical_apps() {
                     'description' => get_the_content(),
                     'app_id' => get_post_meta(get_the_ID(), '_human_app_package_id', true),
                     'pricing' => get_post_meta(get_the_ID(), '_human_app_pricing', true),
+                    'price_amount' => get_post_meta(get_the_ID(), '_human_app_price_amount', true),
+                    'price_currency' => get_post_meta(get_the_ID(), '_human_app_price_currency', true),
+                    'billing_period' => get_post_meta(get_the_ID(), '_human_app_billing_period', true),
+                    'trial_days' => get_post_meta(get_the_ID(), '_human_app_trial_days', true),
                     'target_url' => get_post_meta(get_the_ID(), '_human_app_target_url', true)
                 );
             }
@@ -136,6 +140,10 @@ function human_get_fallback_canonical_apps() {
             'description' => 'Commercial launch product. Offline-first strength training & volume analytics powered by local Room DB and optional cloud identity.',
             'app_id' => 'com.aistudio.humanstrength.kfqjza',
             'pricing' => '30-day introductory trial, then £24/year',
+            'price_amount' => '24.00',
+            'price_currency' => 'GBP',
+            'billing_period' => 'year',
+            'trial_days' => '30',
             'target_url' => '/strength'
         ),
         array(

@@ -272,21 +272,59 @@ function human_get_webpage_schema($post_id) {
 }
 
 function human_get_software_app_schema() {
-    return array(
+    $app_post = get_page_by_path('strength', OBJECT, 'human_app');
+    if (!$app_post) {
+        return null;
+    }
+
+    $status = get_post_meta($app_post->ID, '_human_app_status', true);
+    $package_id = get_post_meta($app_post->ID, '_human_app_package_id', true);
+    $pricing = get_post_meta($app_post->ID, '_human_app_pricing', true);
+    $price_amount = get_post_meta($app_post->ID, '_human_app_price_amount', true);
+    $price_currency = get_post_meta($app_post->ID, '_human_app_price_currency', true);
+
+    $schema = array(
         '@context' => 'https://schema.org',
         '@type' => 'SoftwareApplication',
-        'name' => 'Human Strength',
-        'operatingSystem' => 'Android 8.0+',
+        'name' => get_the_title($app_post->ID),
+        'operatingSystem' => 'Android',
         'applicationCategory' => 'HealthApplication',
-        'offers' => array(
-            '@type' => 'Offer',
-            'price' => '24.00',
-            'priceCurrency' => 'GBP',
-            'priceValidUntil' => '2027-12-31',
-            'description' => 'Annual subscription includes ~30-day introductory trial.'
-        ),
-        'downloadUrl' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza'
     );
+
+    if ($status === 'AVAILABLE') {
+        if ($package_id) {
+            $schema['downloadUrl'] = 'https://play.google.com/store/apps/details?id=' . esc_attr($package_id);
+        }
+        
+        if (!empty($price_amount) || $pricing) {
+            $price_val = '0.00';
+            $currency = 'GBP';
+            
+            if (!empty($price_amount)) {
+                $price_val = $price_amount;
+                $currency = !empty($price_currency) ? $price_currency : 'GBP';
+            } else {
+                if (preg_match('/£([0-9\.]+)/', $pricing, $matches)) {
+                    $price_val = $matches[1];
+                } elseif (preg_match('/\$([0-9\.]+)/', $pricing, $matches)) {
+                    $price_val = $matches[1];
+                    $currency = 'USD';
+                }
+            }
+            
+            $schema['offers'] = array(
+                '@type' => 'Offer',
+                'price' => $price_val,
+                'priceCurrency' => $currency,
+            );
+            
+            if ($pricing) {
+                $schema['offers']['description'] = esc_attr($pricing);
+            }
+        }
+    }
+
+    return $schema;
 }
 
 function human_get_breadcrumb_schema() {

@@ -116,3 +116,16 @@ This platform communicates the unified "One Human" brand vision, showcases the *
    - Hardened all marketing meta save handlers with `current_user_can('edit_post')`, capability checks, and robust relation intval validation.
    - Replaced hardcoded frontend breadcrumbs with dynamic `human_render_breadcrumbs()` and added them to templates lacking them.
    - Realigned breadcrumb structured data by removing Microdata and outputting valid JSON-LD `BreadcrumbList` via SEO engine.
+8. [x] **Sprint 20.2: Marketing Truth & Migration Finalisation**
+   - Refactored `SoftwareApplication` JSON-LD schema to dynamically consume the release state, URL, and pricing of authoritative Human App records.
+   - Expanded data seeding to a proper idempotent, non-destructive, version-based migration pipeline (`human_run_migrations`).
+   - Fixed `Strength V1 Launch` campaign default seed state to "planned" and its core download CTA to "inactive" to align with a pre-release truth.
+9. [x] **Sprint 21: Human Post Marketing Studio**
+   - Refactored `marketing-meta.php` to provide a comprehensive Marketing Studio interface.
+   - Implemented `marketing-readiness.php` for deterministic percentage score, state, and warnings based on Content, SEO, Social, Conversion, Campaign, and Lifecycle sections.
+   - Integrated SEO, Search, and Social workspaces with lightweight preview components.
+   - Integrated Product and Conversion workspaces using existing app and CTA architecture, showing status and warnings.
+   - Established an internal link foundation suggesting related content from tags/categories.
+   - Upgraded `SoftwareApplication` JSON-LD to rely on structured pricing fields (`price_amount`, `price_currency`, etc.).
+   - Upgraded `cpt-apps.php` and `meta-boxes.php` to define, capture, and expose structured pricing fields for apps.
+   - Upgraded `building-the-human-ontology...` article with a complete suite of marketing metadata via migration `1.1.0`.

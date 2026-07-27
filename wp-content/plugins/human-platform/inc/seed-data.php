@@ -228,13 +228,39 @@ function human_get_cornerstone_articles() {
 }
 
 /**
- * Seed Database Hook
+ * Marketing Data Migration Architecture
+ * 
+ * Runs deterministic, idempotent migrations based on schema versions.
+ * Preserves manually edited content and avoids duplicates.
  */
-function human_seed_initial_content() {
-    if (get_option('human_initial_content_seeded_v1')) {
-        return;
+function human_run_migrations() {
+    $current_version = get_option('human_marketing_schema_version', '0.0.0');
+    
+    // Backwards compatibility for early setups
+    if ($current_version === '0.0.0' && get_option('human_initial_content_seeded_v1')) {
+        $current_version = '1.0.0';
+        update_option('human_marketing_schema_version', $current_version);
     }
+    
+    $migrations = array(
+        '1.0.0' => 'human_migration_1_0_0',
+        '1.0.1' => 'human_migration_1_0_1',
+        '1.1.0' => 'human_migration_1_1_0'
+    );
 
+    foreach ($migrations as $version => $callback) {
+        if (version_compare($current_version, $version, '<')) {
+            if (is_callable($callback)) {
+                call_user_func($callback);
+                update_option('human_marketing_schema_version', $version);
+                $current_version = $version;
+            }
+        }
+    }
+}
+add_action('admin_init', 'human_run_migrations');
+
+function human_migration_1_0_0() {
     // Seed Canonical Apps
     $canonical_apps = human_get_fallback_canonical_apps();
     foreach ($canonical_apps as $app_data) {
@@ -252,6 +278,10 @@ function human_seed_initial_content() {
                 update_post_meta($post_id, '_human_app_status', $app_data['status']);
                 update_post_meta($post_id, '_human_app_package_id', $app_data['app_id']);
                 update_post_meta($post_id, '_human_app_pricing', $app_data['pricing']);
+                if (isset($app_data['price_amount'])) update_post_meta($post_id, '_human_app_price_amount', $app_data['price_amount']);
+                if (isset($app_data['price_currency'])) update_post_meta($post_id, '_human_app_price_currency', $app_data['price_currency']);
+                if (isset($app_data['billing_period'])) update_post_meta($post_id, '_human_app_billing_period', $app_data['billing_period']);
+                if (isset($app_data['trial_days'])) update_post_meta($post_id, '_human_app_trial_days', $app_data['trial_days']);
                 update_post_meta($post_id, '_human_app_target_url', $app_data['target_url']);
             }
         }
@@ -329,7 +359,7 @@ function human_seed_initial_content() {
         ));
         if ($post_id && !is_wp_error($post_id)) {
             update_post_meta($post_id, '_human_camp_objective', 'Initial product launch and awareness');
-            update_post_meta($post_id, '_human_camp_status', 'active');
+            update_post_meta($post_id, '_human_camp_status', 'planned'); // Deliberately inactive
             update_post_meta($post_id, '_human_camp_utm_id', 'strength_v1_launch');
             update_post_meta($post_id, '_human_camp_priority', 'high');
             
@@ -344,6 +374,7 @@ function human_seed_initial_content() {
             }
         }
     }
+
     $articles = human_get_cornerstone_articles();
     foreach ($articles as $art) {
         $existing = get_page_by_path($art['slug'], OBJECT, 'post');
@@ -357,15 +388,81 @@ function human_seed_initial_content() {
                 'post_type'    => 'post',
                 'post_date'    => $art['date'] . ' 10:00:00'
             ));
-
             if ($post_id && !is_wp_error($post_id)) {
                 update_post_meta($post_id, '_human_seo_title', $art['seo_title']);
                 update_post_meta($post_id, '_human_seo_description', $art['seo_desc']);
             }
         }
     }
-
+    
+    // Retain legacy flag for reference
     update_option('human_initial_content_seeded_v1', true);
-    update_option('human_marketing_schema_version', '1.0.0');
 }
-add_action('admin_init', 'human_seed_initial_content');
+
+function human_migration_1_0_1() {
+    // Future migrations go here
+}
+
+function human_migration_1_1_0() {
+    // Re-run fallback canonical apps so structured pricing gets updated for existing apps
+    $canonical_apps = human_get_fallback_canonical_apps();
+    foreach ($canonical_apps as $app_data) {
+        $existing_app = get_page_by_path($app_data['slug'], OBJECT, 'human_app');
+        if ($existing_app) {
+            if (isset($app_data['price_amount'])) update_post_meta($existing_app->ID, '_human_app_price_amount', $app_data['price_amount']);
+            if (isset($app_data['price_currency'])) update_post_meta($existing_app->ID, '_human_app_price_currency', $app_data['price_currency']);
+            if (isset($app_data['billing_period'])) update_post_meta($existing_app->ID, '_human_app_billing_period', $app_data['billing_period']);
+            if (isset($app_data['trial_days'])) update_post_meta($existing_app->ID, '_human_app_trial_days', $app_data['trial_days']);
+        }
+    }
+
+    // Upgrade the ontology article with comprehensive marketing metadata
+    $post = get_page_by_path('building-the-human-ontology-towards-a-structured-exercise-knowledge-system', OBJECT, 'post');
+    if ($post) {
+        // SEO
+        update_post_meta($post->ID, '_human_seo_title', 'Building the Human Ontology: Structured Exercise Knowledge');
+        update_post_meta($post->ID, '_human_seo_description', 'Discover how Human Ontology is building a standardized knowledge graph mapping the physics of human movement for AI-powered strength training apps.');
+        update_post_meta($post->ID, '_human_post_search_intent', 'informational');
+        update_post_meta($post->ID, '_human_post_primary_topic', 'human ontology');
+        
+        // Social
+        update_post_meta($post->ID, '_human_social_title', 'The Future of AI Workout Programming');
+        update_post_meta($post->ID, '_human_social_description', 'Building a structured exercise knowledge graph to power intelligent periodization engines.');
+        update_post_meta($post->ID, '_human_social_image', 'https://humanv1.com/assets/human-ontology-diagram.jpg');
+        update_post_meta($post->ID, '_human_promo_copy', 'Standardising the data structures of human movement. Read how the Human Ontology powers AI-driven workout progression. #StrengthTraining #AI');
+        update_post_meta($post->ID, '_human_promo_variant_edu', 'Did you know most workout apps lack a standardized taxonomy? We are fixing that with the Human Ontology.');
+        
+        // Product & CTA
+        $ontology_cta = get_page_by_title('Explore Human Ontology', OBJECT, 'human_cta');
+        if (!$ontology_cta) {
+            $cta_id = wp_insert_post(array(
+                'post_title' => 'Explore Human Ontology',
+                'post_type' => 'human_cta',
+                'post_status' => 'publish'
+            ));
+            if ($cta_id && !is_wp_error($cta_id)) {
+                update_post_meta($cta_id, '_human_cta_label', 'Discover Human Ontology');
+                update_post_meta($cta_id, '_human_cta_supporting_text', 'Learn how we are building a structured exercise knowledge graph.');
+                update_post_meta($cta_id, '_human_cta_destination_url', '/ontology');
+                update_post_meta($cta_id, '_human_cta_type', 'content');
+                update_post_meta($cta_id, '_human_cta_status', 'active');
+                $ontology_cta = get_post($cta_id);
+            }
+        }
+        
+        if ($ontology_cta) {
+            update_post_meta($post->ID, '_human_post_primary_cta', $ontology_cta->ID);
+        }
+        
+        $coach_app = get_page_by_path('coach', OBJECT, 'human_app');
+        if ($coach_app) {
+            update_post_meta($post->ID, '_human_post_primary_product', $coach_app->ID);
+        }
+
+        // Lifecycle
+        update_post_meta($post->ID, '_human_post_content_type', 'evergreen');
+        update_post_meta($post->ID, '_human_post_marketing_status', 'marketing_ready');
+        update_post_meta($post->ID, '_human_post_review_date', '2027-01-01');
+        update_post_meta($post->ID, '_human_post_evergreen', '1');
+    }
+}
