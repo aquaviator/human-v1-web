@@ -163,13 +163,11 @@ function human_render_marketing_details_meta_box($post) {
 function human_save_marketing_meta_boxes($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!isset($_POST['human_marketing_meta_nonce']) || !wp_verify_nonce($_POST['human_marketing_meta_nonce'], 'human_marketing_meta_nonce_action')) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (get_post_type($post_id) !== 'post') return;
 
     // Single fields
     $fields = array(
-        '_human_post_primary_product',
-        '_human_post_primary_cta',
-        '_human_post_secondary_cta',
-        '_human_post_primary_campaign',
         '_human_post_content_type',
         '_human_post_marketing_status',
         '_human_post_review_date',
@@ -179,10 +177,25 @@ function human_save_marketing_meta_boxes($post_id) {
     foreach ($fields as $field) {
         if (isset($_POST[$field])) update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
     }
+    
+    // Relation fields
+    $relation_fields = array(
+        '_human_post_primary_product',
+        '_human_post_primary_cta',
+        '_human_post_secondary_cta',
+        '_human_post_primary_campaign'
+    );
+    foreach ($relation_fields as $field) {
+        if (isset($_POST[$field]) && $_POST[$field] !== '') {
+            update_post_meta($post_id, $field, intval($_POST[$field]));
+        } else {
+            delete_post_meta($post_id, $field);
+        }
+    }
 
     // Array fields
     if (isset($_POST['_human_post_related_products'])) {
-        $related = array_map('sanitize_text_field', $_POST['_human_post_related_products']);
+        $related = array_map('intval', (array) $_POST['_human_post_related_products']);
         update_post_meta($post_id, '_human_post_related_products', $related);
     } else {
         delete_post_meta($post_id, '_human_post_related_products');

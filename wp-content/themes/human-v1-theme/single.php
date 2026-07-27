@@ -24,11 +24,7 @@ if (!have_posts() && !empty($current_slug) && function_exists('human_get_corners
 <main class="site-main section-padding">
     <article class="container" style="max-width: 800px;">
         <!-- Breadcrumb Navigation -->
-        <nav aria-label="Breadcrumb" style="margin-bottom: 2rem; font-family: var(--font-mono); font-size: 0.85rem; color: #64748B;">
-            <a href="<?php echo esc_url(home_url('/')); ?>" style="color: #94A3B8;">Home</a> &gt; 
-            <a href="<?php echo esc_url(home_url('/journal')); ?>" style="color: #94A3B8;">Journal</a> &gt; 
-            <span style="color: var(--human-electric-blue);"><?php echo $fallback_article ? esc_html($fallback_article['title']) : get_the_title(); ?></span>
-        </nav>
+        <?php if (function_exists('human_render_breadcrumbs')) human_render_breadcrumbs(); ?>
 
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
             <header style="margin-bottom: 2.5rem; text-align: left; border-bottom: 1px solid var(--human-border-dark); padding-bottom: 1.5rem;">

@@ -10,6 +10,9 @@ get_header();
 
 <main class="site-main section-padding">
     <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <?php if (function_exists('human_render_breadcrumbs')) human_render_breadcrumbs(); ?>
+        
         <div style="text-align: center; max-width: 800px; margin: 0 auto 3rem;">
             <span class="eyebrow">HUMAN ECOSYSTEM CATALOGUE</span>
             <h1 class="display-title" style="margin-bottom: 1rem;">Human Platform Apps</h1>

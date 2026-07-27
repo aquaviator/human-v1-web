@@ -134,10 +134,24 @@ function human_render_campaign_details_meta_box($post) {
 function human_save_campaign_meta_boxes($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!isset($_POST['human_campaign_meta_nonce']) || !wp_verify_nonce($_POST['human_campaign_meta_nonce'], 'human_campaign_meta_nonce_action')) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (get_post_type($post_id) !== 'human_campaign') return;
 
-    $fields = array('_human_camp_objective', '_human_camp_associated_app', '_human_camp_start_date', '_human_camp_end_date', '_human_camp_status', '_human_camp_primary_cta', '_human_camp_utm_id', '_human_camp_priority');
+    $fields = array('_human_camp_objective', '_human_camp_start_date', '_human_camp_end_date', '_human_camp_status', '_human_camp_utm_id', '_human_camp_priority');
     foreach ($fields as $field) {
-        if (isset($_POST[$field])) update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+        }
+    }
+    
+    // Validate relations as integers
+    $relation_fields = array('_human_camp_associated_app', '_human_camp_primary_cta');
+    foreach ($relation_fields as $field) {
+        if (isset($_POST[$field]) && $_POST[$field] !== '') {
+            update_post_meta($post_id, $field, intval($_POST[$field]));
+        } else {
+            delete_post_meta($post_id, $field);
+        }
     }
 }
 add_action('save_post_human_campaign', 'human_save_campaign_meta_boxes');

@@ -9,6 +9,10 @@ get_header();
 ?>
 
 <main class="site-main">
+    <!-- Breadcrumb Navigation -->
+    <div class="container pt-8 pb-0">
+        <?php if (function_exists('human_render_breadcrumbs')) human_render_breadcrumbs(); ?>
+    </div>
     <!-- HERO -->
     <section class="section-padding" style="background: linear-gradient(180deg, rgba(0,102,255,0.15) 0%, rgba(10,13,16,1) 100%); border-bottom: 1px solid var(--human-border-dark);">
         <div class="container" style="max-width: 900px; text-align: center;">

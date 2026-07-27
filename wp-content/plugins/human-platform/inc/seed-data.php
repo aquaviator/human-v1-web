@@ -273,7 +273,7 @@ function human_seed_initial_content() {
             'supporting' => 'Start your 30-day introductory trial today.',
             'url' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza',
             'type' => 'download',
-            'status' => 'active' // assuming valid
+            'status' => 'inactive'
         ),
         array(
             'title' => 'Explore the Human Ontology',
@@ -366,5 +366,6 @@ function human_seed_initial_content() {
     }
 
     update_option('human_initial_content_seeded_v1', true);
+    update_option('human_marketing_schema_version', '1.0.0');
 }
 add_action('admin_init', 'human_seed_initial_content');

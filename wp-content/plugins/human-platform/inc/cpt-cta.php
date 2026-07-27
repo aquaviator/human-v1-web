@@ -155,13 +155,29 @@ function human_render_cta_details_meta_box($post) {
 function human_save_cta_meta_boxes($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!isset($_POST['human_cta_meta_nonce']) || !wp_verify_nonce($_POST['human_cta_meta_nonce'], 'human_cta_meta_nonce_action')) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if (get_post_type($post_id) !== 'human_cta') return;
 
-    $fields = array('_human_cta_label', '_human_cta_supporting_text', '_human_cta_type', '_human_cta_associated_app', '_human_cta_associated_campaign', '_human_cta_status', '_human_cta_utm_source', '_human_cta_utm_medium', '_human_cta_utm_campaign', '_human_cta_utm_content');
+    $fields = array('_human_cta_label', '_human_cta_supporting_text', '_human_cta_type', '_human_cta_status', '_human_cta_utm_source', '_human_cta_utm_medium', '_human_cta_utm_campaign', '_human_cta_utm_content');
     foreach ($fields as $field) {
-        if (isset($_POST[$field])) update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+        }
     }
     
-    if (isset($_POST['_human_cta_destination_url'])) update_post_meta($post_id, '_human_cta_destination_url', esc_url_raw($_POST['_human_cta_destination_url']));
+    // Validate relations as integers
+    $relation_fields = array('_human_cta_associated_app', '_human_cta_associated_campaign');
+    foreach ($relation_fields as $field) {
+        if (isset($_POST[$field]) && $_POST[$field] !== '') {
+            update_post_meta($post_id, $field, intval($_POST[$field]));
+        } else {
+            delete_post_meta($post_id, $field);
+        }
+    }
+    
+    if (isset($_POST['_human_cta_destination_url'])) {
+        update_post_meta($post_id, '_human_cta_destination_url', esc_url_raw($_POST['_human_cta_destination_url']));
+    }
     
     $new_tab = isset($_POST['_human_cta_new_tab']) ? '1' : '0';
     update_post_meta($post_id, '_human_cta_new_tab', $new_tab);

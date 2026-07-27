@@ -114,6 +114,11 @@ function human_get_seo_metadata($post_id = null) {
             $seo_data['json_ld'][] = human_get_webpage_schema($post_id);
         }
 
+        $breadcrumb_schema = human_get_breadcrumb_schema();
+        if ($breadcrumb_schema) {
+            $seo_data['json_ld'][] = $breadcrumb_schema;
+        }
+
         // Special handling for Human Strength page
         if (is_page('strength') || get_post_field('post_name', $post_id) === 'strength') {
             $seo_data['title'] = 'Human Strength — Android Gym Workout Tracker & Volume Analytics App';
@@ -133,6 +138,21 @@ function human_get_seo_metadata($post_id = null) {
         $seo_data['og_title'] = $seo_data['title'];
         $seo_data['og_description'] = $seo_data['description'];
         $seo_data['canonical_url'] = rtrim($domain, '/') . '/journal';
+    } elseif (is_category()) {
+        $cat = get_category(get_query_var('cat'));
+        $seo_data['title'] = $cat->name . ' — Human Journal';
+        $seo_data['description'] = wp_strip_all_tags(category_description($cat->term_id));
+        if (empty($seo_data['description'])) {
+            $seo_data['description'] = 'Read articles about ' . $cat->name . ' from the Human engineering and research team.';
+        }
+        $seo_data['og_title'] = $seo_data['title'];
+        $seo_data['og_description'] = $seo_data['description'];
+        $seo_data['canonical_url'] = get_category_link($cat->term_id);
+    }
+    
+    $breadcrumb_schema = human_get_breadcrumb_schema();
+    if ($breadcrumb_schema) {
+        $seo_data['json_ld'][] = $breadcrumb_schema;
     }
 
     return $seo_data;
@@ -266,5 +286,27 @@ function human_get_software_app_schema() {
             'description' => 'Annual subscription includes ~30-day introductory trial.'
         ),
         'downloadUrl' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza'
+    );
+}
+
+function human_get_breadcrumb_schema() {
+    if (!function_exists('human_get_breadcrumbs')) return null;
+    $breadcrumbs = human_get_breadcrumbs();
+    if (empty($breadcrumbs) || count($breadcrumbs) <= 1) return null;
+
+    $items = array();
+    foreach ($breadcrumbs as $index => $crumb) {
+        $items[] = array(
+            '@type' => 'ListItem',
+            'position' => $index + 1,
+            'name' => $crumb['title'],
+            'item' => $crumb['url']
+        );
+    }
+
+    return array(
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $items
     );
 }

@@ -108,3 +108,11 @@ This platform communicates the unified "One Human" brand vision, showcases the *
    - Established hierarchical Editorial Taxonomy (Strength Training, Training Knowledge, Human).
    - Built reusable structured breadcrumb architecture.
    - Designed a coherent Admin Experience grouping Marketing configurations under the "Human Ecosystem" menu.
+7. [x] **Sprint 20.1: Marketing Foundation Hardening**
+   - Restored `index.php` theme fallback template.
+   - Decoupled seed data from assumed active Google Play status.
+   - Introduced deterministic `human_marketing_schema_version` schema versioning for migrations.
+   - Hardened `human_get_canonical_apps()` to only use DB if schema version matches, preserving fallback safety during partial migrations.
+   - Hardened all marketing meta save handlers with `current_user_can('edit_post')`, capability checks, and robust relation intval validation.
+   - Replaced hardcoded frontend breadcrumbs with dynamic `human_render_breadcrumbs()` and added them to templates lacking them.
+   - Realigned breadcrumb structured data by removing Microdata and outputting valid JSON-LD `BreadcrumbList` via SEO engine.

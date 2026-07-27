@@ -12,6 +12,9 @@ $cornerstones = function_exists('human_get_cornerstone_articles') ? human_get_co
 
 <main class="site-main section-padding">
     <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <?php if (function_exists('human_render_breadcrumbs')) human_render_breadcrumbs(); ?>
+        
         <div style="text-align: center; max-width: 800px; margin: 0 auto 3rem;">
             <span class="eyebrow">EDITORIAL & RESEARCH</span>
             <h1 class="display-title" style="margin-bottom: 1rem;">Human Journal</h1>
