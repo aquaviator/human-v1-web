@@ -101,3 +101,10 @@ This platform communicates the unified "One Human" brand vision, showcases the *
 3. [x] Built complete `human-v1-theme` WordPress theme (`wp-content/themes/human-v1-theme/`).
 4. [x] Built Node/Express dev preview bridge (`server.ts`) with full SEO tags, Open Graph, 10 cornerstone articles, dynamic `/sitemap.xml`, `/robots.txt`, and REST API endpoints.
 5. [x] Provided complete `README.md` with deployment, database structure, and WordPress administration guide.
+6. [x] **Sprint 20: Marketing Data Foundation (Backend)**
+   - Configured `human_app` to use the database as the authoritative catalogue (with code fallback).
+   - Created `human_cta` and `human_campaign` CPTs.
+   - Added `Marketing Metadata` panel to Journal Posts (Products, CTAs, Campaigns, Content Lifecycle, Search Intent).
+   - Established hierarchical Editorial Taxonomy (Strength Training, Training Knowledge, Human).
+   - Built reusable structured breadcrumb architecture.
+   - Designed a coherent Admin Experience grouping Marketing configurations under the "Human Ecosystem" menu.

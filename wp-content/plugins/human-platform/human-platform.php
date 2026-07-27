@@ -19,6 +19,11 @@ define('HUMAN_PLATFORM_URL', plugin_dir_url(__FILE__));
 
 // Load dependencies
 require_once HUMAN_PLATFORM_PATH . 'inc/cpt-apps.php';
+require_once HUMAN_PLATFORM_PATH . 'inc/cpt-cta.php';
+require_once HUMAN_PLATFORM_PATH . 'inc/cpt-campaign.php';
+require_once HUMAN_PLATFORM_PATH . 'inc/marketing-meta.php';
+require_once HUMAN_PLATFORM_PATH . 'inc/taxonomy.php';
+require_once HUMAN_PLATFORM_PATH . 'inc/breadcrumbs.php';
 require_once HUMAN_PLATFORM_PATH . 'inc/admin-settings.php';
 require_once HUMAN_PLATFORM_PATH . 'inc/meta-boxes.php';
 require_once HUMAN_PLATFORM_PATH . 'inc/seo-engine.php';

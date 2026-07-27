@@ -14,14 +14,13 @@ function human_register_admin_settings() {
     register_setting('human_platform_options_group', 'human_options', 'human_sanitize_options');
 
     add_action('admin_menu', function() {
-        add_menu_page(
-            __('Human Platform Settings', 'human-platform'),
-            __('Human Platform', 'human-platform'),
+        add_submenu_page(
+            'edit.php?post_type=human_app',
+            __('Platform Settings', 'human-platform'),
+            __('Settings', 'human-platform'),
             'manage_options',
             'human-platform-settings',
-            'human_render_settings_page',
-            'dashicons-performance',
-            4
+            'human_render_settings_page'
         );
     });
 }

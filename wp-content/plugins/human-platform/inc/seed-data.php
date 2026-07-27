@@ -235,7 +235,115 @@ function human_seed_initial_content() {
         return;
     }
 
-    // Seed Journal Articles
+    // Seed Canonical Apps
+    $canonical_apps = human_get_fallback_canonical_apps();
+    foreach ($canonical_apps as $app_data) {
+        $existing_app = get_page_by_path($app_data['slug'], OBJECT, 'human_app');
+        if (!$existing_app) {
+            $post_id = wp_insert_post(array(
+                'post_title'   => $app_data['title'],
+                'post_name'    => $app_data['slug'],
+                'post_content' => $app_data['description'],
+                'post_status'  => 'publish',
+                'post_type'    => 'human_app'
+            ));
+            
+            if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, '_human_app_status', $app_data['status']);
+                update_post_meta($post_id, '_human_app_package_id', $app_data['app_id']);
+                update_post_meta($post_id, '_human_app_pricing', $app_data['pricing']);
+                update_post_meta($post_id, '_human_app_target_url', $app_data['target_url']);
+            }
+        }
+    }
+
+    // Seed CTAs
+    $ctas_to_seed = array(
+        array(
+            'title' => 'Explore Human Strength',
+            'label' => 'Explore Human Strength',
+            'supporting' => 'Learn how our offline-first strength log works.',
+            'url' => '/strength',
+            'type' => 'product',
+            'status' => 'active'
+        ),
+        array(
+            'title' => 'Get Human Strength on Google Play',
+            'label' => 'Download on Google Play',
+            'supporting' => 'Start your 30-day introductory trial today.',
+            'url' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza',
+            'type' => 'download',
+            'status' => 'active' // assuming valid
+        ),
+        array(
+            'title' => 'Explore the Human Ontology',
+            'label' => 'Discover Human Ontology',
+            'supporting' => 'Explore the structured exercise knowledge system.',
+            'url' => '/ontology',
+            'type' => 'learn',
+            'status' => 'active'
+        ),
+        array(
+            'title' => 'Read the Training Guides',
+            'label' => 'Read Journal',
+            'supporting' => 'Deep dives into progression and programming.',
+            'url' => '/journal',
+            'type' => 'content',
+            'status' => 'active'
+        )
+    );
+
+    foreach ($ctas_to_seed as $cta) {
+        $existing = get_page_by_title($cta['title'], OBJECT, 'human_cta');
+        if (!$existing) {
+            $post_id = wp_insert_post(array(
+                'post_title' => $cta['title'],
+                'post_status' => 'publish',
+                'post_type' => 'human_cta'
+            ));
+            if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, '_human_cta_label', $cta['label']);
+                update_post_meta($post_id, '_human_cta_supporting_text', $cta['supporting']);
+                update_post_meta($post_id, '_human_cta_destination_url', $cta['url']);
+                update_post_meta($post_id, '_human_cta_type', $cta['type']);
+                update_post_meta($post_id, '_human_cta_status', $cta['status']);
+                
+                // Associate with Human Strength if relevant
+                if ($cta['type'] === 'product' || $cta['type'] === 'download') {
+                    $strength_app = get_page_by_path('strength', OBJECT, 'human_app');
+                    if ($strength_app) {
+                        update_post_meta($post_id, '_human_cta_associated_app', $strength_app->ID);
+                    }
+                }
+            }
+        }
+    }
+
+    // Seed Campaign
+    $existing_camp = get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign');
+    if (!$existing_camp) {
+        $post_id = wp_insert_post(array(
+            'post_title' => 'Strength V1 Launch',
+            'post_status' => 'publish',
+            'post_type' => 'human_campaign'
+        ));
+        if ($post_id && !is_wp_error($post_id)) {
+            update_post_meta($post_id, '_human_camp_objective', 'Initial product launch and awareness');
+            update_post_meta($post_id, '_human_camp_status', 'active');
+            update_post_meta($post_id, '_human_camp_utm_id', 'strength_v1_launch');
+            update_post_meta($post_id, '_human_camp_priority', 'high');
+            
+            $strength_app = get_page_by_path('strength', OBJECT, 'human_app');
+            if ($strength_app) {
+                update_post_meta($post_id, '_human_camp_associated_app', $strength_app->ID);
+            }
+            
+            $primary_cta = get_page_by_title('Get Human Strength on Google Play', OBJECT, 'human_cta');
+            if ($primary_cta) {
+                update_post_meta($post_id, '_human_camp_primary_cta', $primary_cta->ID);
+            }
+        }
+    }
     $articles = human_get_cornerstone_articles();
     foreach ($articles as $art) {
         $existing = get_page_by_path($art['slug'], OBJECT, 'post');

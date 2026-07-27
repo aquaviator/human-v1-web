@@ -71,9 +71,55 @@ function human_register_apps_cpt() {
 add_action('init', 'human_register_apps_cpt');
 
 /**
- * Default Canonical Ecosystem Seed Data Helper
+ * Get Canonical Ecosystem Apps (Source of truth: Database, fallback to Seed data)
  */
 function human_get_canonical_apps() {
+    $apps = array();
+    $query = new WP_Query(array(
+        'post_type' => 'human_app',
+        'posts_per_page' => -1,
+        'post_status' => 'publish',
+        'orderby' => 'menu_order title',
+        'order' => 'ASC'
+    ));
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $status = get_post_meta(get_the_ID(), '_human_app_status', true) ?: 'PLANNED';
+            $badge_color = '#6B7280';
+            $status_label = 'Planned';
+            switch ($status) {
+                case 'AVAILABLE': $badge_color = '#10B981'; $status_label = 'Available'; break;
+                case 'IN_DEVELOPMENT': $badge_color = '#0066FF'; $status_label = 'In Development'; break;
+                case 'COMING_SOON': $badge_color = '#F59E0B'; $status_label = 'Coming Soon'; break;
+            }
+
+            $apps[] = array(
+                'slug' => get_post_field('post_name', get_the_ID()),
+                'title' => get_the_title(),
+                'status' => $status,
+                'status_label' => $status_label,
+                'badge_color' => $badge_color,
+                'description' => get_the_content(),
+                'app_id' => get_post_meta(get_the_ID(), '_human_app_package_id', true),
+                'pricing' => get_post_meta(get_the_ID(), '_human_app_pricing', true),
+                'target_url' => get_post_meta(get_the_ID(), '_human_app_target_url', true)
+            );
+        }
+        wp_reset_postdata();
+    } else {
+        // Fallback if not seeded yet
+        $apps = human_get_fallback_canonical_apps();
+    }
+
+    return $apps;
+}
+
+/**
+ * Default Canonical Ecosystem Seed Data Helper
+ */
+function human_get_fallback_canonical_apps() {
     return array(
         array(
             'slug' => 'strength',
