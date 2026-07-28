@@ -1,0 +1,15 @@
+--- wp-content/plugins/human-platform/inc/admin-settings.php
++++ wp-content/plugins/human-platform/inc/admin-settings.php
+@@ -116,6 +116,12 @@
+                 <div>
+                     <strong>Taxonomy:</strong> <?php echo empty($health['taxonomy']['missing']) ? 'Complete' : 'Missing ' . count($health['taxonomy']['missing']); ?>
+                 </div>
++                <div>
++                    <strong>Pages:</strong> <?php echo $health['pages']['missing'] === 0 ? 'Complete' : $health['pages']['found'] . '/' . $health['pages']['expected']; ?>
++                </div>
++                <div>
++                    <strong>Front/Posts Page:</strong> <?php echo ($health['front_page']['is_page'] && $health['front_page']['posts_page_set']) ? 'Configured' : 'Needs Config'; ?>
++                </div>
+             </div>
+         </div>
+         <?php endif; ?>

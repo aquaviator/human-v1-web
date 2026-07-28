@@ -246,7 +246,8 @@ function human_run_migrations() {
         '1.0.0' => 'human_migration_1_0_0',
         '1.0.1' => 'human_migration_1_0_1',
         '1.1.0' => 'human_migration_1_1_0',
-        '1.2.0' => 'human_migration_1_2_0'
+        '1.2.0' => 'human_migration_1_2_0',
+        '1.3.0' => 'human_migration_1_3_0'
     );
 
     foreach ($migrations as $version => $callback) {
@@ -662,6 +663,11 @@ function human_get_marketing_foundation_health() {
             'footer-menu' => 'unassigned',
             'apps-menu' => 'unassigned'
         ),
+        'pages' => array('expected' => 11, 'found' => 0, 'missing' => 0),
+        'front_page' => array(
+            'is_page' => false,
+            'posts_page_set' => false
+        ),
         'status' => 'HEALTHY'
     );
 
@@ -715,5 +721,141 @@ function human_get_marketing_foundation_health() {
     if (isset($locations['apps-menu']) && $locations['apps-menu'] != 0) $health['navigation']['apps-menu'] = 'assigned';
     else $health['status'] = 'NEEDS ATTENTION';
 
+    // Pages
+    $canonical_pages = array(
+        'home', 'apps', 'strength', 'ontology', 'journal',
+        'about', 'support', 'privacy-policy', 'terms', 'data-deletion', 'contact'
+    );
+    
+    foreach ($canonical_pages as $slug) {
+        if (get_page_by_path($slug, OBJECT, 'page')) {
+            $health['pages']['found']++;
+        } else {
+            $health['pages']['missing']++;
+        }
+    }
+    
+    if ($health['pages']['missing'] > 0) {
+        $health['status'] = 'NEEDS ATTENTION';
+    }
+
+    // Front Page
+    if (get_option('show_on_front') === 'page' && get_option('page_on_front')) {
+        $health['front_page']['is_page'] = true;
+    } else {
+        $health['status'] = 'NEEDS ATTENTION';
+    }
+    
+    if (get_option('page_for_posts')) {
+        $health['front_page']['posts_page_set'] = true;
+    } else {
+        $health['status'] = 'NEEDS ATTENTION';
+    }
+
     return $health;
+}
+
+function human_migration_1_3_0() {
+    // 1. Canonical Pages
+    $pages_to_seed = array(
+        array('title' => 'Home', 'slug' => 'home', 'template' => ''),
+        array('title' => 'Apps', 'slug' => 'apps', 'template' => 'page-apps.php'),
+        array('title' => 'Human Strength', 'slug' => 'strength', 'template' => 'page-strength.php'),
+        array('title' => 'Human Ontology', 'slug' => 'ontology', 'template' => 'page-ontology.php'),
+        array('title' => 'Journal', 'slug' => 'journal', 'template' => ''),
+        array('title' => 'About', 'slug' => 'about', 'template' => 'page-about.php'),
+        array('title' => 'Support', 'slug' => 'support', 'template' => 'page-support.php'),
+        array('title' => 'Privacy Policy', 'slug' => 'privacy-policy', 'template' => 'page-privacy.php'),
+        array('title' => 'Terms', 'slug' => 'terms', 'template' => 'page-terms.php'),
+        array('title' => 'Data Deletion', 'slug' => 'data-deletion', 'template' => 'page-data-deletion.php'),
+        array('title' => 'Contact', 'slug' => 'contact', 'template' => 'page-contact.php')
+    );
+
+    foreach ($pages_to_seed as $p) {
+        $existing = get_page_by_path($p['slug'], OBJECT, 'page');
+        if (!$existing) {
+            $post_id = wp_insert_post(array(
+                'post_title' => $p['title'],
+                'post_name' => $p['slug'],
+                'post_status' => 'publish',
+                'post_type' => 'page'
+            ));
+            if ($post_id && !is_wp_error($post_id)) {
+                if (!empty($p['template'])) {
+                    update_post_meta($post_id, '_wp_page_template', $p['template']);
+                }
+            }
+        } else {
+            // Apply template to existing page if not set
+            if (!empty($p['template'])) {
+                $current_template = get_post_meta($existing->ID, '_wp_page_template', true);
+                if (empty($current_template) || $current_template === 'default') {
+                    update_post_meta($existing->ID, '_wp_page_template', $p['template']);
+                }
+            }
+        }
+    }
+
+    // 2. Set Front Page and Posts Page
+    $home_page = get_page_by_path('home', OBJECT, 'page');
+    if ($home_page && get_option('show_on_front') !== 'page') {
+        update_option('show_on_front', 'page');
+        update_option('page_on_front', $home_page->ID);
+    }
+
+    $journal_page = get_page_by_path('journal', OBJECT, 'page');
+    if ($journal_page && !get_option('page_for_posts')) {
+        update_option('page_for_posts', $journal_page->ID);
+    }
+
+    // 3. Reconcile Menus (Update any custom URLs to point to real pages, specifically for privacy-policy)
+    // Also update existing menus to point to Page objects instead of Custom Links where possible
+    
+    $menu_locations = get_theme_mod('nav_menu_locations');
+    if (is_array($menu_locations)) {
+        foreach ($menu_locations as $location => $menu_id) {
+            if ($menu_id) {
+                $menu_items = wp_get_nav_menu_items($menu_id);
+                if ($menu_items) {
+                    foreach ($menu_items as $item) {
+                        // Change stray /privacy/ to /privacy-policy/
+                        if ($item->type == 'custom' && (strpos($item->url, '/privacy/') !== false || strpos($item->url, '/privacy') === strlen($item->url) - 8)) {
+                            $privacy_page = get_page_by_path('privacy-policy', OBJECT, 'page');
+                            if ($privacy_page) {
+                                wp_update_nav_menu_item($menu_id, $item->db_id, array(
+                                    'menu-item-title' => $item->title,
+                                    'menu-item-object-id' => $privacy_page->ID,
+                                    'menu-item-object' => 'page',
+                                    'menu-item-type' => 'post_type',
+                                    'menu-item-status' => 'publish'
+                                ));
+                            }
+                        } else if ($item->type == 'custom') {
+                            // Attempt to map other custom URLs to canonical pages
+                            $path = parse_url($item->url, PHP_URL_PATH);
+                            if ($path) {
+                                $slug = trim($path, '/');
+                                if (empty($slug)) $slug = 'home';
+                                
+                                // Only remap if it matches our canonical pages exactly
+                                $canonical_slugs = array_column($pages_to_seed, 'slug');
+                                if (in_array($slug, $canonical_slugs)) {
+                                    $page = get_page_by_path($slug, OBJECT, 'page');
+                                    if ($page) {
+                                        wp_update_nav_menu_item($menu_id, $item->db_id, array(
+                                            'menu-item-title' => $item->title,
+                                            'menu-item-object-id' => $page->ID,
+                                            'menu-item-object' => 'page',
+                                            'menu-item-type' => 'post_type',
+                                            'menu-item-status' => 'publish'
+                                        ));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -135,3 +135,10 @@ This platform communicates the unified "One Human" brand vision, showcases the *
     - Refactored `header.php` and `footer.php` to use managed WordPress menus (`primary-menu`, `footer-menu`, `apps-menu`) to avoid hardcoded application truth or release states.
     - Updated Header promotional CTA logic to prioritize resolving active CTAs from the Marketing Foundation if possible.
     - Introduced a Foundation Health Check function (`human_get_marketing_foundation_health`) and surfaced diagnostics in the Platform Settings dashboard.
+11. [x] **Sprint 21.3: Canonical Site Content Reconciliation**
+    - Created schema reconciliation 1.3.0 to bootstrap canonical Pages (Home, Apps, Human Strength, Human Ontology, Journal, About, Support, Privacy Policy, Terms, Data Deletion, Contact).
+    - Preserved existing /privacy-policy/ as canonical privacy location.
+    - Set Home and Journal as `page_on_front` and `page_for_posts` dynamically.
+    - Assigned appropriate existing theme templates (e.g. `page-apps.php`, `page-strength.php`, etc) to respective canonical pages.
+    - Repaired `wp_nav_menu` structures to convert custom URLs into page objects, explicitly linking to the correct privacy page, preserving safe navigation.
+    - Extended `human_get_marketing_foundation_health` diagnostics to report canonical page states and WordPress configuration values.
