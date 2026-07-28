@@ -129,3 +129,9 @@ This platform communicates the unified "One Human" brand vision, showcases the *
    - Upgraded `SoftwareApplication` JSON-LD to rely on structured pricing fields (`price_amount`, `price_currency`, etc.).
    - Upgraded `cpt-apps.php` and `meta-boxes.php` to define, capture, and expose structured pricing fields for apps.
    - Upgraded `building-the-human-ontology...` article with a complete suite of marketing metadata via migration `1.1.0`.
+10. [x] **Sprint 21.2: Production Data & Navigation Reconciliation**
+    - Addressed migration-state drift on production where the legacy flag was set but the marketing dataset was empty.
+    - Added `human_migration_1_2_0` to run idempotently on production to reconcile missing App, CTA, Campaign, and Taxonomy Canonical Data safely without overwriting marketer edits.
+    - Refactored `header.php` and `footer.php` to use managed WordPress menus (`primary-menu`, `footer-menu`, `apps-menu`) to avoid hardcoded application truth or release states.
+    - Updated Header promotional CTA logic to prioritize resolving active CTAs from the Marketing Foundation if possible.
+    - Introduced a Foundation Health Check function (`human_get_marketing_foundation_health`) and surfaced diagnostics in the Platform Settings dashboard.

@@ -81,9 +81,45 @@ function human_render_settings_page() {
     }
 
     $options = wp_parse_args(get_option('human_options', array()), human_get_default_options());
+    
+    // Foundation Diagnostics
+    $health = function_exists('human_get_marketing_foundation_health') ? human_get_marketing_foundation_health() : null;
     ?>
     <div class="wrap">
         <h1><span class="dashicons dashicons-performance" style="font-size:30px;width:30px;height:30px;margin-right:10px;"></span> <?php _e('Human Platform Settings', 'human-platform'); ?></h1>
+        
+        <?php if ($health): ?>
+        <div style="background:#fff; border-left:4px solid <?php echo $health['status'] === 'HEALTHY' ? '#46b450' : '#d63638'; ?>; padding:15px; margin-bottom:20px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
+            <h3 style="margin-top:0;">Marketing Foundation <span style="background:<?php echo $health['status'] === 'HEALTHY' ? '#46b450' : '#d63638'; ?>;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:normal;margin-left:10px;"><?php echo esc_html($health['status']); ?></span></h3>
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; font-size:13px;">
+                <div>
+                    <strong>Schema:</strong> <?php echo esc_html($health['schema_version']); ?>
+                </div>
+                <div>
+                    <strong>Apps:</strong> <?php echo $health['apps']['found'] . ' / ' . $health['apps']['expected']; ?>
+                </div>
+                <div>
+                    <strong>CTAs:</strong> <?php echo $health['ctas']['missing'] === 0 ? 'Complete' : $health['ctas']['found'] . '/' . $health['ctas']['expected']; ?>
+                </div>
+                <div>
+                    <strong>Campaign:</strong> <?php echo $health['campaigns']['missing'] === 0 ? 'Complete' : 'Missing'; ?>
+                </div>
+                <div>
+                    <strong>Primary Menu:</strong> <?php echo esc_html(ucfirst($health['navigation']['primary-menu'])); ?>
+                </div>
+                <div>
+                    <strong>Footer Menu:</strong> <?php echo esc_html(ucfirst($health['navigation']['footer-menu'])); ?>
+                </div>
+                <div>
+                    <strong>Apps Menu:</strong> <?php echo esc_html(ucfirst($health['navigation']['apps-menu'])); ?>
+                </div>
+                <div>
+                    <strong>Taxonomy:</strong> <?php echo empty($health['taxonomy']['missing']) ? 'Complete' : 'Missing ' . count($health['taxonomy']['missing']); ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <p><?php _e('Central configuration for brand details, Google Play integration, SEO defaults, and marketing options across humanv1.com.', 'human-platform'); ?></p>
 
         <form method="post" action="options.php">

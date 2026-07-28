@@ -35,6 +35,17 @@ if (!defined('ABSPATH')) {
         </button>
 
         <nav id="primaryNav" aria-label="Primary Navigation">
+            <?php
+            if (has_nav_menu('primary-menu')) {
+                wp_nav_menu(array(
+                    'theme_location' => 'primary-menu',
+                    'container'      => false,
+                    'menu_class'     => 'main-nav',
+                    'menu_id'        => 'mainNavList',
+                    'fallback_cb'    => false,
+                ));
+            } else {
+            ?>
             <ul class="main-nav" id="mainNavList">
                 <li><a href="<?php echo esc_url(home_url('/')); ?>">Home</a></li>
                 <li><a href="<?php echo esc_url(home_url('/apps')); ?>">Apps</a></li>
@@ -42,14 +53,37 @@ if (!defined('ABSPATH')) {
                 <li><a href="<?php echo esc_url(home_url('/journal')); ?>">Journal</a></li>
                 <li><a href="<?php echo esc_url(home_url('/about')); ?>">About</a></li>
                 <li><a href="<?php echo esc_url(home_url('/support')); ?>">Support</a></li>
-                <li class="mobile-cta-item">
-                    <a href="<?php echo esc_url(home_url('/strength')); ?>" class="btn btn-primary mobile-cta-btn">Explore Human Strength</a>
-                </li>
             </ul>
+            <?php } ?>
         </nav>
-
         <div class="header-cta">
-            <a href="<?php echo esc_url(home_url('/strength')); ?>" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;">Human Strength</a>
+            <?php 
+            $header_cta_label = 'Explore Human Strength';
+            $header_cta_url = home_url('/strength');
+            
+            $strength_app = get_page_by_path('strength', OBJECT, 'human_app');
+            if ($strength_app) {
+                $ctas = get_posts(array(
+                    'post_type' => 'human_cta',
+                    'meta_key' => '_human_cta_associated_app',
+                    'meta_value' => $strength_app->ID,
+                    'post_status' => 'publish',
+                    'numberposts' => 1,
+                    'meta_query' => array(
+                        array(
+                            'key' => '_human_cta_status',
+                            'value' => 'active',
+                            'compare' => '='
+                        )
+                    )
+                ));
+                if (!empty($ctas)) {
+                    $header_cta_label = get_post_meta($ctas[0]->ID, '_human_cta_label', true) ?: $ctas[0]->post_title;
+                    $header_cta_url = get_post_meta($ctas[0]->ID, '_human_cta_destination_url', true) ?: home_url('/strength');
+                }
+            }
+            ?>
+            <a href="<?php echo esc_url($header_cta_url); ?>" class="btn btn-primary" style="padding: 0.6rem 1.25rem; font-size: 0.85rem;"><?php echo esc_html($header_cta_label); ?></a>
         </div>
     </div>
 </header>

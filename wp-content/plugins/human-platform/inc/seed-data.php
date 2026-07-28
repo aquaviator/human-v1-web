@@ -245,7 +245,8 @@ function human_run_migrations() {
     $migrations = array(
         '1.0.0' => 'human_migration_1_0_0',
         '1.0.1' => 'human_migration_1_0_1',
-        '1.1.0' => 'human_migration_1_1_0'
+        '1.1.0' => 'human_migration_1_1_0',
+        '1.2.0' => 'human_migration_1_2_0'
     );
 
     foreach ($migrations as $version => $callback) {
@@ -465,4 +466,254 @@ function human_migration_1_1_0() {
         update_post_meta($post->ID, '_human_post_review_date', '2027-01-01');
         update_post_meta($post->ID, '_human_post_evergreen', '1');
     }
+}
+
+function human_migration_1_2_0() {
+    // 1. Reconcile App Catalogue
+    $canonical_apps = human_get_fallback_canonical_apps();
+    foreach ($canonical_apps as $app_data) {
+        $existing_app = get_page_by_path($app_data['slug'], OBJECT, 'human_app');
+        if (!$existing_app) {
+            $post_id = wp_insert_post(array(
+                'post_title'   => $app_data['title'],
+                'post_name'    => $app_data['slug'],
+                'post_content' => $app_data['description'],
+                'post_status'  => 'publish',
+                'post_type'    => 'human_app'
+            ));
+            if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, '_human_app_status', $app_data['status']); // Safe default
+                update_post_meta($post_id, '_human_app_package_id', $app_data['app_id']);
+                update_post_meta($post_id, '_human_app_pricing', $app_data['pricing']);
+                if (isset($app_data['price_amount'])) update_post_meta($post_id, '_human_app_price_amount', $app_data['price_amount']);
+                if (isset($app_data['price_currency'])) update_post_meta($post_id, '_human_app_price_currency', $app_data['price_currency']);
+                if (isset($app_data['billing_period'])) update_post_meta($post_id, '_human_app_billing_period', $app_data['billing_period']);
+                if (isset($app_data['trial_days'])) update_post_meta($post_id, '_human_app_trial_days', $app_data['trial_days']);
+                update_post_meta($post_id, '_human_app_target_url', $app_data['target_url']);
+            }
+        }
+    }
+
+    // 2. Reconcile Canonical CTAs
+    $ctas_to_seed = array(
+        array(
+            'title' => 'Explore Human Strength',
+            'label' => 'Explore Human Strength',
+            'supporting' => 'Learn how our offline-first strength log works.',
+            'url' => '/strength',
+            'type' => 'product',
+            'status' => 'active',
+            'associated_app_slug' => 'strength'
+        ),
+        array(
+            'title' => 'Get Human Strength on Google Play',
+            'label' => 'Download App',
+            'supporting' => 'Now available for early access on Android.',
+            'url' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza',
+            'type' => 'download',
+            'status' => 'inactive',
+            'associated_app_slug' => 'strength'
+        ),
+        array(
+            'title' => 'Explore Human Ontology',
+            'label' => 'Discover Human Ontology',
+            'supporting' => 'Explore the structured exercise knowledge system.',
+            'url' => '/ontology',
+            'type' => 'learn',
+            'status' => 'active'
+        ),
+        array(
+            'title' => 'Read the Training Guides',
+            'label' => 'Read Journal',
+            'supporting' => 'Deep dives into progression and programming.',
+            'url' => '/journal',
+            'type' => 'content',
+            'status' => 'active'
+        )
+    );
+    foreach ($ctas_to_seed as $cta) {
+        $existing = get_page_by_title($cta['title'], OBJECT, 'human_cta');
+        if (!$existing) {
+            $post_id = wp_insert_post(array(
+                'post_title' => $cta['title'],
+                'post_status' => 'publish',
+                'post_type' => 'human_cta'
+            ));
+            if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, '_human_cta_label', $cta['label']);
+                update_post_meta($post_id, '_human_cta_supporting_text', $cta['supporting']);
+                update_post_meta($post_id, '_human_cta_destination_url', $cta['url']);
+                update_post_meta($post_id, '_human_cta_type', $cta['type']);
+                update_post_meta($post_id, '_human_cta_status', $cta['status']);
+                if (isset($cta['associated_app_slug'])) {
+                    $app = get_page_by_path($cta['associated_app_slug'], OBJECT, 'human_app');
+                    if ($app) {
+                        update_post_meta($post_id, '_human_cta_associated_app', $app->ID);
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. Reconcile Campaign
+    $existing_camp = get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign');
+    if (!$existing_camp) {
+        $post_id = wp_insert_post(array(
+            'post_title' => 'Strength V1 Launch',
+            'post_status' => 'publish',
+            'post_type' => 'human_campaign'
+        ));
+        if ($post_id && !is_wp_error($post_id)) {
+            update_post_meta($post_id, '_human_camp_objective', 'Initial product launch and awareness');
+            update_post_meta($post_id, '_human_camp_status', 'planned'); // Deliberately inactive
+            update_post_meta($post_id, '_human_camp_utm_id', 'strength_v1_launch');
+            update_post_meta($post_id, '_human_camp_priority', 'high');
+            
+            $strength_app = get_page_by_path('strength', OBJECT, 'human_app');
+            if ($strength_app) {
+                update_post_meta($post_id, '_human_camp_associated_app', $strength_app->ID);
+            }
+            
+            $primary_cta = get_page_by_title('Get Human Strength on Google Play', OBJECT, 'human_cta');
+            if ($primary_cta) {
+                update_post_meta($post_id, '_human_camp_primary_cta', $primary_cta->ID);
+            }
+        }
+    }
+
+    // Reconcile Taxonomy
+    $required_cats = array('Programming', 'Human Ontology', 'Product News');
+    foreach ($required_cats as $cat) {
+        if (!term_exists($cat, 'category')) {
+            wp_insert_term($cat, 'category');
+        }
+    }
+
+    // 4. Reconcile Menus
+    
+    // Helper function to create missing menus and their items
+    if (!function_exists('human_create_menu_if_missing')) {
+        function human_create_menu_if_missing($menu_name, $location, $items) {
+            $locations = get_theme_mod('nav_menu_locations');
+            if (isset($locations[$location]) && $locations[$location] != 0) {
+                return; // Already assigned
+            }
+            $menu_exists = wp_get_nav_menu_object($menu_name);
+            if (!$menu_exists) {
+                $menu_id = wp_create_nav_menu($menu_name);
+                if (!is_wp_error($menu_id)) {
+                    foreach ($items as $item) {
+                        wp_update_nav_menu_item($menu_id, 0, array(
+                            'menu-item-title' => $item['title'],
+                            'menu-item-url' => $item['url'],
+                            'menu-item-status' => 'publish'
+                        ));
+                    }
+                    $locations[$location] = $menu_id;
+                    set_theme_mod('nav_menu_locations', $locations);
+                }
+            } else {
+                $locations[$location] = $menu_exists->term_id;
+                set_theme_mod('nav_menu_locations', $locations);
+            }
+        }
+    }
+    
+    // Primary Header Menu
+    human_create_menu_if_missing('Primary Header Menu', 'primary-menu', array(
+        array('title' => 'Home', 'url' => '/'),
+        array('title' => 'Apps', 'url' => '/apps'),
+        array('title' => 'Human Ontology', 'url' => '/ontology'),
+        array('title' => 'Journal', 'url' => '/journal'),
+        array('title' => 'About', 'url' => '/about'),
+        array('title' => 'Support', 'url' => '/support')
+    ));
+
+    // Footer Navigation Menu
+    human_create_menu_if_missing('Footer Navigation Menu', 'footer-menu', array(
+        array('title' => 'Human Ontology', 'url' => '/ontology'),
+        array('title' => 'Human Journal', 'url' => '/journal'),
+        array('title' => 'About Platform', 'url' => '/about'),
+        array('title' => 'Contact & Media', 'url' => '/contact'),
+        array('title' => 'Customer Support', 'url' => '/support'),
+        array('title' => 'Privacy Policy', 'url' => '/privacy'),
+        array('title' => 'Terms of Service', 'url' => '/terms'),
+        array('title' => 'Data Deletion', 'url' => '/data-deletion')
+    ));
+
+    // Apps Navigation Menu
+    $app_items = array();
+    foreach ($canonical_apps as $app_data) {
+        $target = !empty($app_data['target_url']) ? $app_data['target_url'] : '/apps';
+        $app_items[] = array('title' => $app_data['title'], 'url' => $target);
+    }
+    human_create_menu_if_missing('Apps Navigation Menu', 'apps-menu', $app_items);
+}
+
+function human_get_marketing_foundation_health() {
+    $health = array(
+        'schema_version' => get_option('human_marketing_schema_version', '0.0.0'),
+        'apps' => array('expected' => 8, 'found' => 0, 'missing' => 0),
+        'ctas' => array('expected' => 4, 'found' => 0, 'missing' => 0),
+        'campaigns' => array('expected' => 1, 'found' => 0, 'missing' => 0),
+        'taxonomy' => array('missing' => array()),
+        'navigation' => array(
+            'primary-menu' => 'unassigned',
+            'footer-menu' => 'unassigned',
+            'apps-menu' => 'unassigned'
+        ),
+        'status' => 'HEALTHY'
+    );
+
+    // Apps
+    $apps = wp_count_posts('human_app');
+    $health['apps']['found'] = $apps->publish ?? 0;
+    $health['apps']['missing'] = max(0, $health['apps']['expected'] - $health['apps']['found']);
+    if ($health['apps']['missing'] > 0) $health['status'] = 'NEEDS ATTENTION';
+
+    // CTAs
+    $ctas = array(
+        'Explore Human Strength',
+        'Get Human Strength on Google Play',
+        'Explore Human Ontology',
+        'Read the Training Guides'
+    );
+    foreach ($ctas as $cta_title) {
+        if (get_page_by_title($cta_title, OBJECT, 'human_cta')) {
+            $health['ctas']['found']++;
+        } else {
+            $health['ctas']['missing']++;
+        }
+    }
+    if ($health['ctas']['missing'] > 0) $health['status'] = 'NEEDS ATTENTION';
+
+    // Campaigns
+    if (get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign')) {
+        $health['campaigns']['found'] = 1;
+    } else {
+        $health['campaigns']['missing'] = 1;
+        $health['status'] = 'NEEDS ATTENTION';
+    }
+    
+    // Taxonomy
+    $required_cats = array('Programming', 'Human Ontology', 'Product News');
+    foreach ($required_cats as $cat) {
+        if (!term_exists($cat, 'category')) {
+            $health['taxonomy']['missing'][] = $cat;
+            $health['status'] = 'NEEDS ATTENTION';
+        }
+    }
+
+    // Navigation
+    $locations = get_theme_mod('nav_menu_locations');
+    if (isset($locations['primary-menu']) && $locations['primary-menu'] != 0) $health['navigation']['primary-menu'] = 'assigned';
+    else $health['status'] = 'NEEDS ATTENTION';
+    
+    if (isset($locations['footer-menu']) && $locations['footer-menu'] != 0) $health['navigation']['footer-menu'] = 'assigned';
+    else $health['status'] = 'NEEDS ATTENTION';
+    
+    if (isset($locations['apps-menu']) && $locations['apps-menu'] != 0) $health['navigation']['apps-menu'] = 'assigned';
+    else $health['status'] = 'NEEDS ATTENTION';
+
+    return $health;
 }
