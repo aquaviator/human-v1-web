@@ -122,7 +122,7 @@ function human_get_seo_metadata($post_id = null) {
         // Special handling for Human Strength page
         if (is_page('strength') || get_post_field('post_name', $post_id) === 'strength') {
             $seo_data['title'] = 'Human Strength — Android Gym Workout Tracker & Volume Analytics App';
-            $seo_data['description'] = 'Track strength progress offline with Human Strength for Android. Features local Room database, estimated 1RM, supersets, and tonnage volume analytics. £24/yr after ~30-day trial.';
+            $seo_data['description'] = 'Track strength progress with Human Strength for Android. Human Strength is currently in Google Play Internal Testing for eligible or invited testers.';
             $seo_data['og_title'] = $seo_data['title'];
             $seo_data['og_description'] = $seo_data['description'];
             $seo_data['json_ld'][] = human_get_software_app_schema();
@@ -272,55 +272,49 @@ function human_get_webpage_schema($post_id) {
 }
 
 function human_get_software_app_schema() {
-    $app_post = get_page_by_path('strength', OBJECT, 'human_app');
-    if (!$app_post) {
+    if (!function_exists('human_get_canonical_apps')) {
         return null;
     }
 
-    $status = get_post_meta($app_post->ID, '_human_app_status', true);
-    $package_id = get_post_meta($app_post->ID, '_human_app_package_id', true);
-    $pricing = get_post_meta($app_post->ID, '_human_app_pricing', true);
-    $price_amount = get_post_meta($app_post->ID, '_human_app_price_amount', true);
-    $price_currency = get_post_meta($app_post->ID, '_human_app_price_currency', true);
+    $strength = null;
+    foreach (human_get_canonical_apps() as $app) {
+        if (($app['slug'] ?? '') === 'strength') {
+            $strength = $app;
+            break;
+        }
+    }
+
+    if (!$strength) {
+        return null;
+    }
 
     $schema = array(
         '@context' => 'https://schema.org',
         '@type' => 'SoftwareApplication',
-        'name' => get_the_title($app_post->ID),
+        'name' => $strength['title'],
         'operatingSystem' => 'Android',
         'applicationCategory' => 'HealthApplication',
     );
 
-    if ($status === 'AVAILABLE') {
-        if ($package_id) {
-            $schema['downloadUrl'] = 'https://play.google.com/store/apps/details?id=' . esc_attr($package_id);
-        }
-        
-        if (!empty($price_amount) || $pricing) {
-            $price_val = '0.00';
-            $currency = 'GBP';
-            
-            if (!empty($price_amount)) {
-                $price_val = $price_amount;
-                $currency = !empty($price_currency) ? $price_currency : 'GBP';
-            } else {
-                if (preg_match('/£([0-9\.]+)/', $pricing, $matches)) {
-                    $price_val = $matches[1];
-                } elseif (preg_match('/\$([0-9\.]+)/', $pricing, $matches)) {
-                    $price_val = $matches[1];
-                    $currency = 'USD';
-                }
-            }
-            
+    $status = human_normalize_app_status($strength['current_status'], 'strength');
+    $play_url = human_validate_google_play_url($strength['play_url'], 'public');
+
+    // A public Store destination and Available status are both required. An
+    // internal-test URL must never appear as downloadUrl or commercial schema.
+    if ($status === 'available' && $play_url !== '') {
+        $schema['downloadUrl'] = $play_url;
+
+        $price_amount = trim((string) $strength['price_amount']);
+        $price_currency = strtoupper(trim((string) $strength['price_currency']));
+        if (preg_match('/^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/', $price_amount)
+            && preg_match('/^[A-Z]{3}$/', $price_currency)
+        ) {
             $schema['offers'] = array(
                 '@type' => 'Offer',
-                'price' => $price_val,
-                'priceCurrency' => $currency,
+                'price' => $price_amount,
+                'priceCurrency' => $price_currency,
+                'url' => $play_url,
             );
-            
-            if ($pricing) {
-                $schema['offers']['description'] = esc_attr($pricing);
-            }
         }
     }
 

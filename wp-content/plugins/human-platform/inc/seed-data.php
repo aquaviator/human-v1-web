@@ -239,7 +239,21 @@ function human_run_migrations() {
     // Backwards compatibility for early setups
     if ($current_version === '0.0.0' && get_option('human_initial_content_seeded_v1')) {
         $current_version = '1.0.0';
-        update_option('human_marketing_schema_version', $current_version);
+        update_option('human_marketing_schema_version', $current_version, false);
+        if (get_option('human_marketing_schema_version', '0.0.0') !== $current_version) {
+            $result = new WP_Error(
+                'human_migration_legacy_version_write_failed',
+                'The legacy Human marketing schema version could not be verified.'
+            );
+            update_option('human_marketing_migration_error', array(
+                'version' => $current_version,
+                'code' => $result->get_error_code(),
+                'message' => $result->get_error_message(),
+                'data' => $result->get_error_data(),
+                'recorded_at' => time()
+            ), false);
+            return $result;
+        }
     }
     
     $migrations = array(
@@ -247,16 +261,63 @@ function human_run_migrations() {
         '1.0.1' => 'human_migration_1_0_1',
         '1.1.0' => 'human_migration_1_1_0',
         '1.2.0' => 'human_migration_1_2_0',
-        '1.3.0' => 'human_migration_1_3_0'
+        '1.3.0' => 'human_migration_1_3_0',
+        '1.4.0' => 'human_migration_1_4_0'
     );
 
     foreach ($migrations as $version => $callback) {
         if (version_compare($current_version, $version, '<')) {
-            if (is_callable($callback)) {
-                call_user_func($callback);
-                update_option('human_marketing_schema_version', $version);
-                $current_version = $version;
+            if (!is_callable($callback)) {
+                $result = new WP_Error(
+                    'human_migration_callback_missing',
+                    sprintf('Migration callback for version %s is unavailable.', $version)
+                );
+                update_option('human_marketing_migration_error', array(
+                    'version' => $version,
+                    'code' => $result->get_error_code(),
+                    'message' => $result->get_error_message(),
+                    'data' => $result->get_error_data(),
+                    'recorded_at' => time()
+                ), false);
+                return $result;
             }
+
+            $result = call_user_func($callback);
+            if ($result === false) {
+                $result = new WP_Error(
+                    'human_migration_failed',
+                    sprintf('Migration %s reported a failure.', $version)
+                );
+            }
+            if (is_wp_error($result)) {
+                update_option('human_marketing_migration_error', array(
+                    'version' => $version,
+                    'code' => $result->get_error_code(),
+                    'message' => $result->get_error_message(),
+                    'data' => $result->get_error_data(),
+                    'recorded_at' => time()
+                ), false);
+                return $result;
+            }
+
+            update_option('human_marketing_schema_version', $version, false);
+            if (get_option('human_marketing_schema_version', '0.0.0') !== $version) {
+                $result = new WP_Error(
+                    'human_migration_version_write_failed',
+                    sprintf('Migration %s completed but its schema version could not be verified.', $version)
+                );
+                update_option('human_marketing_migration_error', array(
+                    'version' => $version,
+                    'code' => $result->get_error_code(),
+                    'message' => $result->get_error_message(),
+                    'data' => $result->get_error_data(),
+                    'recorded_at' => time()
+                ), false);
+                return $result;
+            }
+
+            delete_option('human_marketing_migration_error');
+            $current_version = $version;
         }
     }
 }
@@ -857,5 +918,465 @@ function human_migration_1_3_0() {
                 }
             }
         }
+    }
+}
+
+/**
+ * Acquire the app reconciliation lock.
+ *
+ * add_option() is used for acquisition because the option name has a unique
+ * database index. Unlike a get/set transient sequence, concurrent requests
+ * cannot both insert the lock. An expired lock is replaced with one atomic,
+ * value-conditioned database update, so stale-lock contenders also have only
+ * one winner.
+ *
+ * @return string|WP_Error Owner token on success.
+ */
+function human_acquire_app_migration_lock() {
+    global $wpdb;
+
+    $option_name = 'human_app_migration_1_4_0_lock';
+    $now = time();
+    $token = function_exists('wp_generate_uuid4')
+        ? wp_generate_uuid4()
+        : uniqid('human-app-migration-', true);
+    $payload = array(
+        'owner' => $token,
+        'acquired_at' => $now,
+        'expires_at' => $now + 900
+    );
+
+    if (add_option($option_name, $payload, '', 'no')) {
+        return $token;
+    }
+
+    $existing = get_option($option_name, null);
+    if (!is_array($existing) || empty($existing['expires_at']) || (int) $existing['expires_at'] > $now) {
+        return new WP_Error(
+            'human_app_migration_locked',
+            'The Human app migration is already running.'
+        );
+    }
+
+    /*
+     * Atomically replace only the exact stale value that was inspected. A
+     * delete/add takeover would allow one stale contender to delete a lock
+     * just acquired by another contender.
+     */
+    $replaced = $wpdb->query($wpdb->prepare(
+        "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s",
+        maybe_serialize($payload),
+        $option_name,
+        maybe_serialize($existing)
+    ));
+    wp_cache_delete($option_name, 'options');
+
+    if ($replaced !== 1) {
+        return new WP_Error(
+            'human_app_migration_lock_race',
+            'Another request acquired the Human app migration lock.'
+        );
+    }
+
+    return $token;
+}
+
+/**
+ * Release the app reconciliation lock only when this process still owns it.
+ */
+function human_release_app_migration_lock($owner_token) {
+    global $wpdb;
+
+    $option_name = 'human_app_migration_1_4_0_lock';
+    $existing = get_option($option_name, null);
+
+    if (is_array($existing)
+        && isset($existing['owner'])
+        && hash_equals((string) $existing['owner'], (string) $owner_token)) {
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s",
+            $option_name,
+            maybe_serialize($existing)
+        ));
+        wp_cache_delete($option_name, 'options');
+    }
+}
+
+/**
+ * Return every App post ID that has the exact canonical slug, including trash.
+ *
+ * @return int[]|WP_Error
+ */
+function human_find_app_ids_by_slug($slug) {
+    global $wpdb;
+
+    $post_ids = $wpdb->get_col($wpdb->prepare(
+        "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_name = %s ORDER BY ID ASC",
+        'human_app',
+        sanitize_title($slug)
+    ));
+
+    if ($wpdb->last_error) {
+        return new WP_Error(
+            'human_app_slug_lookup_failed',
+            sprintf('Could not inspect existing Human App records for "%s".', sanitize_title($slug))
+        );
+    }
+
+    return array_map('intval', $post_ids);
+}
+
+/**
+ * Write a scalar meta value and verify the stored value by reading it back.
+ *
+ * update_post_meta() returning false is ambiguous (no change or failure), so
+ * its return value is deliberately not used as the success test.
+ *
+ * @return true|WP_Error
+ */
+function human_write_verified_app_meta($post_id, $meta_key, $value) {
+    $expected = (string) $value;
+    $current = (string) get_post_meta($post_id, $meta_key, true);
+    $exists = metadata_exists('post', $post_id, $meta_key);
+
+    if (!$exists || $current !== $expected) {
+        update_post_meta($post_id, $meta_key, $expected);
+    }
+
+    $stored = (string) get_post_meta($post_id, $meta_key, true);
+    if (!metadata_exists('post', $post_id, $meta_key) || $stored !== $expected) {
+        return new WP_Error(
+            'human_app_meta_write_failed',
+            sprintf('Could not verify %s for Human App post %d.', $meta_key, $post_id)
+        );
+    }
+
+    return true;
+}
+
+/**
+ * Determine whether a field is still an untouched seeded value.
+ */
+function human_app_value_is_reconcilable($current, $canonical, $legacy_values, $value_exists = true) {
+    $current = (string) $current;
+    if (!$value_exists || $current === (string) $canonical) {
+        return true;
+    }
+
+    foreach ((array) $legacy_values as $legacy_value) {
+        if ($current === (string) $legacy_value) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Record a preserved editor value in the in-memory migration report.
+ */
+function human_record_app_migration_conflict(&$conflicts, $slug, $field, $current, $canonical) {
+    $conflicts[] = array(
+        'slug' => (string) $slug,
+        'field' => (string) $field,
+        'preserved_value' => (string) $current,
+        'canonical_value' => (string) $canonical
+    );
+}
+
+/**
+ * Reconcile the canonical Human App catalogue without deleting editor data.
+ *
+ * @return true|WP_Error
+ */
+function human_migration_1_4_0() {
+    if (!function_exists('human_get_app_definitions')) {
+        return new WP_Error(
+            'human_app_definitions_missing',
+            'The canonical Human app definitions are unavailable.'
+        );
+    }
+
+    $definitions = human_get_app_definitions();
+    $required_fields = array(
+        'slug',
+        'title',
+        'current_status',
+        'status_label',
+        'badge_color',
+        'description',
+        'app_id',
+        'pricing',
+        'price_amount',
+        'price_currency',
+        'billing_period',
+        'trial_days',
+        'target_url',
+        'play_url',
+        'internal_test_url',
+        'cta_label',
+        'legacy_statuses',
+        'legacy_descriptions',
+        'legacy_target_urls',
+        'legacy_pricing'
+    );
+
+    if (!is_array($definitions) || count($definitions) !== 8) {
+        return new WP_Error(
+            'human_app_definitions_invalid',
+            'The canonical Human app catalogue must contain exactly eight definitions.'
+        );
+    }
+
+    $definition_slugs = array();
+    foreach ($definitions as $definition_key => $definition) {
+        if (!is_array($definition)
+            || count($definition) !== count($required_fields)
+            || array_diff($required_fields, array_keys($definition))
+            || array_diff(array_keys($definition), $required_fields)) {
+            return new WP_Error(
+                'human_app_definition_shape_invalid',
+                'Every canonical Human app definition must contain the complete 20-field contract.'
+            );
+        }
+
+        $definition_slug = sanitize_title($definition['slug']);
+        if ($definition_slug === ''
+            || sanitize_key((string) $definition_key) !== $definition_slug
+            || isset($definition_slugs[$definition_slug])
+        ) {
+            return new WP_Error(
+                'human_app_definition_slug_invalid',
+                'Canonical Human app keys and slugs must match and be non-empty and unique.'
+            );
+        }
+        if (!in_array($definition['current_status'], human_get_allowed_app_statuses(), true)
+            || human_normalize_app_status($definition['current_status'], $definition_slug) !== $definition['current_status']
+        ) {
+            return new WP_Error(
+                'human_app_definition_status_invalid',
+                sprintf('The canonical lifecycle status for "%s" is invalid.', $definition_slug)
+            );
+        }
+        foreach (array('legacy_statuses', 'legacy_descriptions', 'legacy_target_urls', 'legacy_pricing') as $legacy_field) {
+            if (!is_array($definition[$legacy_field])) {
+                return new WP_Error(
+                    'human_app_definition_legacy_contract_invalid',
+                    sprintf('The legacy field %s for "%s" must be an array.', $legacy_field, $definition_slug)
+                );
+            }
+        }
+        $definition_slugs[$definition_slug] = true;
+    }
+
+    $owner_token = human_acquire_app_migration_lock();
+    if (is_wp_error($owner_token)) {
+        return $owner_token;
+    }
+
+    try {
+        $matches_by_slug = array();
+
+        // Complete duplicate preflight: no writes occur until every slug passes.
+        foreach ($definitions as $definition) {
+            $slug = sanitize_title($definition['slug']);
+            $matches = human_find_app_ids_by_slug($slug);
+            if (is_wp_error($matches)) {
+                return $matches;
+            }
+            if (count($matches) > 1) {
+                return new WP_Error(
+                    'human_app_duplicate_slug',
+                    sprintf('Multiple Human App records use the canonical slug "%s".', $slug),
+                    array('slug' => $slug, 'post_ids' => array_map('intval', $matches))
+                );
+            }
+            if (count($matches) === 1) {
+                $existing_post = get_post((int) $matches[0]);
+                if (!$existing_post
+                    || $existing_post->post_type !== 'human_app'
+                    || $existing_post->post_name !== $slug
+                    || $existing_post->post_status !== 'publish'
+                ) {
+                    return new WP_Error(
+                        'human_app_existing_record_not_publishable',
+                        sprintf('The canonical Human App record for "%s" must be resolved before migration.', $slug),
+                        array(
+                            'slug' => $slug,
+                            'post_id' => (int) $matches[0],
+                            'post_status' => $existing_post ? $existing_post->post_status : 'missing'
+                        )
+                    );
+                }
+            }
+            $matches_by_slug[$slug] = $matches;
+        }
+
+        $conflicts = array();
+        $meta_contract = array(
+            'current_status' => '_human_app_status',
+            'app_id' => '_human_app_package_id',
+            'pricing' => '_human_app_pricing',
+            'price_amount' => '_human_app_price_amount',
+            'price_currency' => '_human_app_price_currency',
+            'billing_period' => '_human_app_billing_period',
+            'trial_days' => '_human_app_trial_days',
+            'target_url' => '_human_app_target_url',
+            'play_url' => '_human_app_play_url',
+            'internal_test_url' => '_human_app_internal_test_url',
+            'cta_label' => '_human_app_cta_label'
+        );
+        $legacy_contract = array(
+            'current_status' => 'legacy_statuses',
+            'pricing' => 'legacy_pricing',
+            'target_url' => 'legacy_target_urls'
+        );
+
+        foreach ($definitions as $definition) {
+            $slug = sanitize_title($definition['slug']);
+            $matches = $matches_by_slug[$slug];
+            $is_new = empty($matches);
+
+            if ($is_new) {
+                $post_id = wp_insert_post(array(
+                    'post_title' => (string) $definition['title'],
+                    'post_name' => $slug,
+                    'post_content' => (string) $definition['description'],
+                    'post_status' => 'publish',
+                    'post_type' => 'human_app'
+                ), true);
+
+                if (is_wp_error($post_id) || !$post_id) {
+                    return is_wp_error($post_id)
+                        ? $post_id
+                        : new WP_Error('human_app_insert_failed', sprintf('Could not create Human App "%s".', $slug));
+                }
+            } else {
+                $post_id = (int) $matches[0];
+            }
+
+            $post = get_post($post_id);
+            if (!$post
+                || $post->post_type !== 'human_app'
+                || $post->post_name !== $slug
+                || $post->post_status !== 'publish'
+            ) {
+                return new WP_Error(
+                    'human_app_post_verification_failed',
+                    sprintf('Could not verify the Human App post for "%s".', $slug)
+                );
+            }
+            if ($is_new
+                && ($post->post_title !== (string) $definition['title']
+                    || $post->post_content !== (string) $definition['description']
+                    || $post->post_status !== 'publish')) {
+                return new WP_Error(
+                    'human_app_insert_readback_failed',
+                    sprintf('The newly created Human App "%s" did not match its canonical post fields.', $slug)
+                );
+            }
+
+            $post_update = array('ID' => $post_id);
+            $needs_post_update = false;
+
+            if ($is_new || $post->post_title === (string) $definition['title']) {
+                if ($post->post_title !== (string) $definition['title']) {
+                    $post_update['post_title'] = (string) $definition['title'];
+                    $needs_post_update = true;
+                }
+            } else {
+                human_record_app_migration_conflict(
+                    $conflicts,
+                    $slug,
+                    'title',
+                    $post->post_title,
+                    $definition['title']
+                );
+            }
+
+            if ($is_new || human_app_value_is_reconcilable(
+                $post->post_content,
+                $definition['description'],
+                $definition['legacy_descriptions'],
+                true
+            )) {
+                if ($post->post_content !== (string) $definition['description']) {
+                    $post_update['post_content'] = (string) $definition['description'];
+                    $needs_post_update = true;
+                }
+            } else {
+                human_record_app_migration_conflict(
+                    $conflicts,
+                    $slug,
+                    'description',
+                    $post->post_content,
+                    $definition['description']
+                );
+            }
+
+            if ($needs_post_update) {
+                $updated_post_id = wp_update_post(wp_slash($post_update), true);
+                if (is_wp_error($updated_post_id) || (int) $updated_post_id !== $post_id) {
+                    return is_wp_error($updated_post_id)
+                        ? $updated_post_id
+                        : new WP_Error('human_app_post_update_failed', sprintf('Could not update Human App "%s".', $slug));
+                }
+            }
+
+            $verified_post = get_post($post_id);
+            if (!$verified_post
+                || $verified_post->post_type !== 'human_app'
+                || $verified_post->post_name !== $slug
+                || $verified_post->post_status !== 'publish'
+            ) {
+                return new WP_Error('human_app_post_readback_failed', sprintf('Could not reload Human App "%s".', $slug));
+            }
+            if (isset($post_update['post_title']) && $verified_post->post_title !== (string) $definition['title']) {
+                return new WP_Error('human_app_title_write_failed', sprintf('Could not verify the title for "%s".', $slug));
+            }
+            if (isset($post_update['post_content']) && $verified_post->post_content !== (string) $definition['description']) {
+                return new WP_Error('human_app_content_write_failed', sprintf('Could not verify the description for "%s".', $slug));
+            }
+
+            foreach ($meta_contract as $field => $meta_key) {
+                $current = (string) get_post_meta($post_id, $meta_key, true);
+                $value_exists = metadata_exists('post', $post_id, $meta_key);
+                $legacy_values = isset($legacy_contract[$field])
+                    ? $definition[$legacy_contract[$field]]
+                    : array();
+
+                if ($is_new || human_app_value_is_reconcilable(
+                    $current,
+                    $definition[$field],
+                    $legacy_values,
+                    $value_exists
+                )) {
+                    $write_result = human_write_verified_app_meta($post_id, $meta_key, $definition[$field]);
+                    if (is_wp_error($write_result)) {
+                        return $write_result;
+                    }
+                } else {
+                    human_record_app_migration_conflict(
+                        $conflicts,
+                        $slug,
+                        $field,
+                        $current,
+                        $definition[$field]
+                    );
+                }
+            }
+        }
+
+        update_option('human_app_migration_1_4_0_conflicts', $conflicts, false);
+        if (get_option('human_app_migration_1_4_0_conflicts', null) !== $conflicts) {
+            return new WP_Error(
+                'human_app_conflict_report_write_failed',
+                'Could not verify the Human app migration conflict report.'
+            );
+        }
+
+        return true;
+    } finally {
+        human_release_app_migration_lock($owner_token);
     }
 }

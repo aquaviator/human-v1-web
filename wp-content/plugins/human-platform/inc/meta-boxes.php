@@ -77,14 +77,24 @@ function human_render_seo_meta_box($post) {
 function human_render_app_details_meta_box($post) {
     wp_nonce_field('human_app_meta_nonce_action', 'human_app_meta_nonce');
 
-    $app_status  = get_post_meta($post->ID, '_human_app_status', true);
+    $app_slug = get_post_field('post_name', $post->ID);
+    $definitions = human_get_app_definitions();
+    $definition = isset($definitions[$app_slug]) ? $definitions[$app_slug] : null;
+    $app_status  = human_normalize_app_status(get_post_meta($post->ID, '_human_app_status', true), $app_slug);
     $package_id  = get_post_meta($post->ID, '_human_app_package_id', true);
     $pricing     = get_post_meta($post->ID, '_human_app_pricing', true);
     $price_amount = get_post_meta($post->ID, '_human_app_price_amount', true);
-    $price_currency = get_post_meta($post->ID, '_human_app_price_currency', true) ?: 'GBP';
-    $billing_period = get_post_meta($post->ID, '_human_app_billing_period', true) ?: 'year';
-    $trial_days   = get_post_meta($post->ID, '_human_app_trial_days', true) ?: '30';
+    $price_currency = metadata_exists('post', $post->ID, '_human_app_price_currency')
+        ? get_post_meta($post->ID, '_human_app_price_currency', true)
+        : ($definition['price_currency'] ?? '');
+    $billing_period = metadata_exists('post', $post->ID, '_human_app_billing_period')
+        ? get_post_meta($post->ID, '_human_app_billing_period', true)
+        : ($definition['billing_period'] ?? '');
+    $trial_days = metadata_exists('post', $post->ID, '_human_app_trial_days')
+        ? get_post_meta($post->ID, '_human_app_trial_days', true)
+        : ($definition['trial_days'] ?? '');
     $play_url    = get_post_meta($post->ID, '_human_app_play_url', true);
+    $internal_test_url = get_post_meta($post->ID, '_human_app_internal_test_url', true);
     $cta_label   = get_post_meta($post->ID, '_human_app_cta_label', true);
     $cta_target  = get_post_meta($post->ID, '_human_app_target_url', true);
     ?>
@@ -92,10 +102,12 @@ function human_render_app_details_meta_box($post) {
         <div>
             <label for="human_app_status"><strong><?php _e('App Commercial Status', 'human-platform'); ?></strong></label>
             <select id="human_app_status" name="_human_app_status" class="widefat">
-                <option value="AVAILABLE" <?php selected($app_status, 'AVAILABLE'); ?>>AVAILABLE (Commercial Launch)</option>
-                <option value="IN_DEVELOPMENT" <?php selected($app_status, 'IN_DEVELOPMENT'); ?>>IN DEVELOPMENT (Next Module)</option>
-                <option value="COMING_SOON" <?php selected($app_status, 'COMING_SOON'); ?>>COMING SOON</option>
-                <option value="PLANNED" <?php selected($app_status, 'PLANNED'); ?>>PLANNED (Platform Vision)</option>
+                <option value="available" <?php selected($app_status, 'available'); ?>><?php _e('Available', 'human-platform'); ?></option>
+                <option value="internal_testing" <?php selected($app_status, 'internal_testing'); ?>><?php _e('Internal Testing', 'human-platform'); ?></option>
+                <option value="coming_soon" <?php selected($app_status, 'coming_soon'); ?>><?php _e('Coming Soon', 'human-platform'); ?></option>
+                <option value="future" <?php selected($app_status, 'future'); ?>><?php _e('Future Product', 'human-platform'); ?></option>
+                <option value="paused" <?php selected($app_status, 'paused'); ?>><?php _e('Paused', 'human-platform'); ?></option>
+                <option value="retired" <?php selected($app_status, 'retired'); ?>><?php _e('Retired', 'human-platform'); ?></option>
             </select>
         </div>
         <div>
@@ -103,8 +115,8 @@ function human_render_app_details_meta_box($post) {
             <input type="text" id="human_app_package_id" name="_human_app_package_id" value="<?php echo esc_attr($package_id); ?>" class="widefat" placeholder="e.g. com.aistudio.humanstrength.kfqjza">
         </div>
         <div>
-            <label for="human_app_pricing"><strong><?php _e('Display Pricing & Trial Copy', 'human-platform'); ?></strong></label>
-            <input type="text" id="human_app_pricing" name="_human_app_pricing" value="<?php echo esc_attr($pricing); ?>" class="widefat" placeholder="e.g. 30-day introductory trial, then £24/year">
+            <label for="human_app_pricing"><strong><?php _e('Display Pricing', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_app_pricing" name="_human_app_pricing" value="<?php echo esc_attr($pricing); ?>" class="widefat" placeholder="e.g. £24/year through Google Play">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px;">
             <div>
@@ -118,6 +130,7 @@ function human_render_app_details_meta_box($post) {
             <div>
                 <label for="human_app_billing_period"><small>Billing Period</small></label>
                 <select id="human_app_billing_period" name="_human_app_billing_period" class="widefat">
+                    <option value="" <?php selected($billing_period, ''); ?>>Not set</option>
                     <option value="year" <?php selected($billing_period, 'year'); ?>>Year</option>
                     <option value="month" <?php selected($billing_period, 'month'); ?>>Month</option>
                     <option value="one_time" <?php selected($billing_period, 'one_time'); ?>>One-time</option>
@@ -131,6 +144,12 @@ function human_render_app_details_meta_box($post) {
         <div>
             <label for="human_app_play_url"><strong><?php _e('Google Play Listing URL', 'human-platform'); ?></strong></label>
             <input type="url" id="human_app_play_url" name="_human_app_play_url" value="<?php echo esc_url($play_url); ?>" class="widefat" placeholder="https://play.google.com/store/apps/details?id=...">
+            <p class="description"><?php _e('Public Store listing only. Used only when status is Available.', 'human-platform'); ?></p>
+        </div>
+        <div>
+            <label for="human_app_internal_test_url"><strong><?php _e('Google Play Internal Testing URL', 'human-platform'); ?></strong></label>
+            <input type="url" id="human_app_internal_test_url" name="_human_app_internal_test_url" value="<?php echo esc_url($internal_test_url); ?>" class="widefat" placeholder="https://play.google.com/apps/internaltest/...">
+            <p class="description"><?php _e('Tester opt-in URL. Never exposed as a public Store download URL.', 'human-platform'); ?></p>
         </div>
         <div>
             <label for="human_app_cta_label"><strong><?php _e('Primary CTA Label', 'human-platform'); ?></strong></label>
@@ -149,33 +168,106 @@ function human_save_meta_boxes($post_id) {
         return;
     }
 
-    if (isset($_POST['human_seo_meta_nonce']) && wp_verify_nonce($_POST['human_seo_meta_nonce'], 'human_seo_meta_nonce_action')) {
+    if (wp_is_post_revision($post_id) || !current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    if (isset($_POST['human_seo_meta_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['human_seo_meta_nonce'])), 'human_seo_meta_nonce_action')) {
         $fields = array('_human_seo_title', '_human_seo_description', '_human_canonical_url', '_human_social_title', '_human_social_description', '_human_social_image');
         foreach ($fields as $field) {
             if (isset($_POST[$field])) {
+                $submitted_value = wp_unslash($_POST[$field]);
                 if ($field === '_human_canonical_url' || $field === '_human_social_image') {
-                    update_post_meta($post_id, $field, esc_url_raw($_POST[$field]));
+                    update_post_meta($post_id, $field, esc_url_raw($submitted_value));
                 } else {
-                    update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+                    update_post_meta($post_id, $field, sanitize_text_field($submitted_value));
                 }
             }
         }
     }
 
-    if (isset($_POST['human_app_meta_nonce']) && wp_verify_nonce($_POST['human_app_meta_nonce'], 'human_app_meta_nonce_action')) {
-        $app_fields = array(
-            '_human_app_status', '_human_app_package_id', '_human_app_pricing', 
-            '_human_app_price_amount', '_human_app_price_currency', '_human_app_billing_period', '_human_app_trial_days',
-            '_human_app_play_url', '_human_app_cta_label', '_human_app_target_url'
-        );
-        foreach ($app_fields as $field) {
-            if (isset($_POST[$field])) {
-                if ($field === '_human_app_play_url') {
-                    update_post_meta($post_id, $field, esc_url_raw($_POST[$field]));
-                } else {
-                    update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
-                }
-            }
+    if (get_post_type($post_id) !== 'human_app'
+        || !isset($_POST['human_app_meta_nonce'])
+        || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['human_app_meta_nonce'])), 'human_app_meta_nonce_action')
+    ) {
+        return;
+    }
+
+    if (isset($_POST['_human_app_status'])) {
+        $submitted_status = trim((string) wp_unslash($_POST['_human_app_status']));
+        if (in_array($submitted_status, human_get_allowed_app_statuses(), true)) {
+            update_post_meta($post_id, '_human_app_status', $submitted_status);
+        }
+    }
+
+    $text_fields = array(
+        '_human_app_pricing',
+        '_human_app_cta_label',
+        '_human_app_target_url',
+    );
+    foreach ($text_fields as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, $field, sanitize_text_field(wp_unslash($_POST[$field])));
+        }
+    }
+
+    if (isset($_POST['_human_app_package_id'])) {
+        $package_id = sanitize_text_field(wp_unslash($_POST['_human_app_package_id']));
+        if ($package_id === '' || preg_match('/^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*){1,}$/', $package_id)) {
+            update_post_meta($post_id, '_human_app_package_id', $package_id);
+        }
+    }
+
+    if (isset($_POST['_human_app_price_amount'])) {
+        $price_amount = sanitize_text_field(wp_unslash($_POST['_human_app_price_amount']));
+        if ($price_amount === '') {
+            update_post_meta($post_id, '_human_app_price_amount', '');
+        } elseif (is_numeric($price_amount) && (float) $price_amount >= 0) {
+            update_post_meta($post_id, '_human_app_price_amount', number_format((float) $price_amount, 2, '.', ''));
+        }
+    }
+
+    if (isset($_POST['_human_app_price_currency'])) {
+        $currency = strtoupper(sanitize_text_field(wp_unslash($_POST['_human_app_price_currency'])));
+        if ($currency === '' || preg_match('/^[A-Z]{3}$/', $currency)) {
+            update_post_meta($post_id, '_human_app_price_currency', $currency);
+        }
+    }
+
+    if (isset($_POST['_human_app_billing_period'])) {
+        $billing_period = sanitize_key(wp_unslash($_POST['_human_app_billing_period']));
+        if (in_array($billing_period, array('', 'year', 'month', 'one_time'), true)) {
+            update_post_meta($post_id, '_human_app_billing_period', $billing_period);
+        }
+    }
+
+    if (isset($_POST['_human_app_trial_days'])) {
+        $trial_days = sanitize_text_field(wp_unslash($_POST['_human_app_trial_days']));
+        if ($trial_days === '') {
+            update_post_meta($post_id, '_human_app_trial_days', '');
+        } elseif (ctype_digit($trial_days)) {
+            update_post_meta($post_id, '_human_app_trial_days', (string) absint($trial_days));
+        }
+    }
+
+    $url_fields = array(
+        '_human_app_play_url' => 'public',
+        '_human_app_internal_test_url' => 'internal',
+    );
+    foreach ($url_fields as $field => $url_type) {
+        if (!isset($_POST[$field])) {
+            continue;
+        }
+
+        $submitted_url = trim((string) wp_unslash($_POST[$field]));
+        if ($submitted_url === '') {
+            update_post_meta($post_id, $field, '');
+            continue;
+        }
+
+        $validated_url = human_validate_google_play_url($submitted_url, $url_type);
+        if ($validated_url !== '') {
+            update_post_meta($post_id, $field, $validated_url);
         }
     }
 }
