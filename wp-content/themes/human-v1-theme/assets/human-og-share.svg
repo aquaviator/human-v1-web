@@ -10,17 +10,17 @@
   
   <!-- Eyebrow Tag -->
   <rect x="70" y="80" width="340" height="36" rx="18" fill="#121519" stroke="#0066FF" stroke-opacity="0.4"/>
-  <text x="90" y="103" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="14" fill="#0066FF" letter-spacing="2">PERFORMANCE TECHNOLOGY</text>
+  <text x="90" y="103" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="14" fill="#0066FF" letter-spacing="2">HUMAN V1 PLATFORM</text>
 
   <!-- Main Headline -->
   <text x="70" y="210" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="64" fill="#FFFFFF" letter-spacing="-1.5">Train. Track. Transform.</text>
   
   <!-- Subtitle -->
   <text x="70" y="270" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="24" fill="#94A3B8" width="1000">
-    The unified fitness technology platform connecting Human Strength, Human
+    Human V1 is the platform behind Human Strength and future Human applications.
   </text>
   <text x="70" y="305" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="24" fill="#94A3B8">
-    Ontology exercise intelligence, volume analytics, and performance science.
+    Be the best version of you.
   </text>
 
   <!-- Product Badges Grid -->
@@ -30,8 +30,8 @@
     <circle cx="36" cy="36" r="14" fill="#10B981" fill-opacity="0.2"/>
     <circle cx="36" cy="36" r="5" fill="#10B981"/>
     <text x="62" y="42" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF">Human Strength</text>
-    <text x="24" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94A3B8">Android App • Available</text>
-    <text x="24" y="100" font-family="'JetBrains Mono', monospace" font-size="13" fill="#10B981">£24/yr (~30-day trial)</text>
+    <text x="24" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94A3B8">Android • Internal Testing</text>
+    <text x="24" y="100" font-family="'JetBrains Mono', monospace" font-size="13" fill="#10B981">£24/year via Google Play</text>
   </g>
 
   <!-- Human Ontology Badge -->
@@ -40,14 +40,14 @@
     <circle cx="36" cy="36" r="14" fill="#0066FF" fill-opacity="0.2"/>
     <circle cx="36" cy="36" r="5" fill="#0066FF"/>
     <text x="62" y="42" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="20" fill="#FFFFFF">Human Ontology</text>
-    <text x="24" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94A3B8">Exercise Knowledge Graph</text>
-    <text x="24" y="100" font-family="'JetBrains Mono', monospace" font-size="13" fill="#0066FF">Major Programme</text>
+    <text x="24" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94A3B8">Exercise Knowledge Programme</text>
+    <text x="24" y="100" font-family="'JetBrains Mono', monospace" font-size="13" fill="#0066FF">Ongoing Programme</text>
   </g>
 
   <!-- Human Ecosystem Badge -->
   <g transform="translate(670, 365)">
     <rect width="450" height="130" rx="12" fill="#121519" stroke="#2A303A" stroke-width="1.5"/>
-    <text x="24" y="42" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="18" fill="#FFFFFF">Full Human Ecosystem</text>
+    <text x="24" y="42" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="18" fill="#FFFFFF">Future Human V1 Products</text>
     <text x="24" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94A3B8">HIIT • Running • Recovery • Mobility</text>
     <text x="24" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#94A3B8">Nutrition • Coach • Community</text>
   </g>
@@ -55,5 +55,5 @@
   <!-- Footer Branding -->
   <line x1="70" y1="540" x2="1120" y2="540" stroke="#2A303A" stroke-width="1"/>
   <text x="70" y="575" font-family="'JetBrains Mono', monospace" font-size="16" fill="#0066FF" font-weight="600">humanv1.com</text>
-  <text x="1120" y="575" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748B" text-anchor="end">© 2026 Human Performance Technology</text>
+  <text x="1120" y="575" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748B" text-anchor="end">Human V1 • humanv1.com</text>
 </svg>

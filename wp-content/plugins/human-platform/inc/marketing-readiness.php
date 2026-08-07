@@ -69,16 +69,22 @@ function human_get_post_marketing_readiness($post_id) {
     $search_intent = get_post_meta($post_id, '_human_post_search_intent', true);
     $primary_topic = get_post_meta($post_id, '_human_post_primary_topic', true);
 
-    if (!empty($seo_title)) {
+    $seo_title_length = function_exists('mb_strlen') ? mb_strlen((string) $seo_title) : strlen((string) $seo_title);
+    if ($seo_title_length >= 30 && $seo_title_length <= 65) {
         $seo_score += 5;
-        $readiness['sections']['seo']['ready'][] = 'SEO title complete';
+        $readiness['sections']['seo']['ready'][] = 'SEO title is present and within the 30-65 character quality range';
+    } elseif ($seo_title_length > 0) {
+        $readiness['sections']['seo']['warnings'][] = 'SEO title exists but should be reviewed for length (target 30-65 characters)';
     } else {
         $readiness['sections']['seo']['warnings'][] = 'SEO title is missing';
     }
 
-    if (!empty($seo_desc)) {
+    $seo_desc_length = function_exists('mb_strlen') ? mb_strlen((string) $seo_desc) : strlen((string) $seo_desc);
+    if ($seo_desc_length >= 100 && $seo_desc_length <= 170) {
         $seo_score += 5;
-        $readiness['sections']['seo']['ready'][] = 'Meta description complete';
+        $readiness['sections']['seo']['ready'][] = 'Meta description is present and within the 100-170 character quality range';
+    } elseif ($seo_desc_length > 0) {
+        $readiness['sections']['seo']['warnings'][] = 'Meta description exists but should be reviewed for length (target 100-170 characters)';
     } else {
         $readiness['sections']['seo']['warnings'][] = 'Meta description is missing';
     }
@@ -107,23 +113,36 @@ function human_get_post_marketing_readiness($post_id) {
     $social_image = get_post_meta($post_id, '_human_social_image', true);
     $promo_copy = get_post_meta($post_id, '_human_promo_copy', true);
 
-    if (!empty($social_title)) {
+    $social_title_length = function_exists('mb_strlen') ? mb_strlen((string) $social_title) : strlen((string) $social_title);
+    if ($social_title_length >= 20 && $social_title_length <= 70) {
         $social_score += 5;
-        $readiness['sections']['social']['ready'][] = 'Social title complete';
+        $readiness['sections']['social']['ready'][] = 'Social title is present and within the 20-70 character quality range';
+    } elseif ($social_title_length > 0) {
+        $readiness['sections']['social']['warnings'][] = 'Social title exists but should be reviewed for length (target 20-70 characters)';
     } else {
         $readiness['sections']['social']['warnings'][] = 'Social title is missing';
     }
 
-    if (!empty($social_desc)) {
+    $social_desc_length = function_exists('mb_strlen') ? mb_strlen((string) $social_desc) : strlen((string) $social_desc);
+    if ($social_desc_length >= 60 && $social_desc_length <= 200) {
         $social_score += 5;
-        $readiness['sections']['social']['ready'][] = 'Social description complete';
+        $readiness['sections']['social']['ready'][] = 'Social description is present and within the 60-200 character quality range';
+    } elseif ($social_desc_length > 0) {
+        $readiness['sections']['social']['warnings'][] = 'Social description exists but should be reviewed for length (target 60-200 characters)';
     } else {
         $readiness['sections']['social']['warnings'][] = 'Social description is missing';
     }
 
     if (!empty($social_image)) {
-        $social_score += 5;
-        $readiness['sections']['social']['ready'][] = 'Social share image configured';
+        $social_image_url = esc_url_raw($social_image, array('https'));
+        $social_image_path = wp_parse_url($social_image_url, PHP_URL_PATH);
+        $social_image_ext = is_string($social_image_path) ? strtolower(pathinfo($social_image_path, PATHINFO_EXTENSION)) : '';
+        if ($social_image_url !== '' && in_array($social_image_ext, array('jpg', 'jpeg', 'png', 'webp'), true)) {
+            $social_score += 5;
+            $readiness['sections']['social']['ready'][] = 'Social share image is a supported HTTPS raster asset';
+        } else {
+            $readiness['sections']['social']['warnings'][] = 'Social share image should be an HTTPS JPG, PNG, or WebP asset';
+        }
     } else {
         if (has_post_thumbnail($post_id)) {
             $social_score += 3;

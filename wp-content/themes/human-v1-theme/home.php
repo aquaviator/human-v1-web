@@ -16,10 +16,10 @@ $cornerstones = function_exists('human_get_cornerstone_articles') ? human_get_co
         <?php if (function_exists('human_render_breadcrumbs')) human_render_breadcrumbs(); ?>
         
         <div style="text-align: center; max-width: 800px; margin: 0 auto 3rem;">
-            <span class="eyebrow">EDITORIAL & RESEARCH</span>
+            <span class="eyebrow">HUMAN V1 JOURNAL</span>
             <h1 class="display-title" style="margin-bottom: 1rem;">Human Journal</h1>
             <p style="font-size: clamp(1rem, 2.5vw, 1.2rem); color: #94A3B8; line-height: 1.6;">
-                Evidence-based training guides, performance science, strength analytics, and exercise ontology research from the Human team.
+                Training articles, Human Strength product updates, exercise knowledge work, and notes on the development of the Human V1 platform.
             </p>
         </div>
 
@@ -60,7 +60,7 @@ $cornerstones = function_exists('human_get_cornerstone_articles') ? human_get_co
                         </div>
 
                         <div style="font-size: 0.8rem; color: #64748B; border-top: 1px solid var(--human-border-dark); padding-top: 1rem; font-family: var(--font-mono); display: flex; justify-content: space-between; align-items: center;">
-                            <span><?php echo esc_html($art['author']); ?></span>
+                            <span><?php echo esc_html($art['date']); ?></span>
                             <a href="<?php echo esc_url(home_url('/journal/' . $art['slug'])); ?>" style="color: var(--human-electric-blue); font-weight: 600;">Read Article &rarr;</a>
                         </div>
                     </article>

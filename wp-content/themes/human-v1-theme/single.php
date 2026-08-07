@@ -43,7 +43,7 @@ if (!have_posts() && !empty($current_slug) && function_exists('human_get_corners
 
             <footer style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--human-border-dark);">
                 <div class="card-padding" style="background: var(--human-dark-surface); border: 1px solid var(--human-border-dark); border-radius: 12px; text-align: center;">
-                    <span class="eyebrow">HUMAN PERFORMANCE ECOSYSTEM</span>
+                    <span class="eyebrow">HUMAN V1</span>
                     <h3 style="color: var(--human-white); margin-bottom: 0.5rem;">Take Your Training Data Seriously</h3>
                     <p style="color: #94A3B8; margin-bottom: 1.5rem; font-size: 0.95rem;">
                         Human Strength provides offline-first Room local database workout logging with automated volume analytics and estimated 1RM progression on Android.
@@ -58,7 +58,7 @@ if (!have_posts() && !empty($current_slug) && function_exists('human_get_corners
                 </span>
                 <h1 class="display-title" style="margin: 0.75rem 0 1.25rem; font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.25;"><?php echo esc_html($fallback_article['title']); ?></h1>
                 <div style="color: #64748B; font-size: 0.85rem; font-family: var(--font-mono);">
-                    By <?php echo esc_html($fallback_article['author']); ?> | Published on <?php echo esc_html($fallback_article['date']); ?>
+                    Published on <?php echo esc_html($fallback_article['date']); ?>
                 </div>
             </header>
 
@@ -68,7 +68,7 @@ if (!have_posts() && !empty($current_slug) && function_exists('human_get_corners
 
             <footer style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--human-border-dark);">
                 <div class="card-padding" style="background: var(--human-dark-surface); border: 1px solid var(--human-border-dark); border-radius: 12px; text-align: center;">
-                    <span class="eyebrow">HUMAN PERFORMANCE ECOSYSTEM</span>
+                    <span class="eyebrow">HUMAN V1</span>
                     <h3 style="color: var(--human-white); margin-bottom: 0.5rem;">Take Your Training Data Seriously</h3>
                     <p style="color: #94A3B8; margin-bottom: 1.5rem; font-size: 0.95rem;">
                         Human Strength provides offline-first Room local database workout logging with automated volume analytics and estimated 1RM progression on Android.
