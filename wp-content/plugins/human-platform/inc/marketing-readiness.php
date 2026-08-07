@@ -22,6 +22,11 @@ function human_get_post_marketing_readiness($post_id) {
     $post = get_post($post_id);
     if (!$post) return $readiness;
 
+    $is_sample_content = get_post_meta($post_id, '_human_is_sample', true) === '1';
+    if ($is_sample_content) {
+        $readiness['all_warnings'][] = 'Sample/reference content is never automation eligible.';
+    }
+
     // 1. CONTENT (Max 20%)
     $content_score = 0;
     if (!empty($post->post_title)) {
@@ -209,7 +214,11 @@ function human_get_post_marketing_readiness($post_id) {
         $readiness['sections']['campaign']['ready'][] = 'Associated with campaign';
 
         $camp_status = get_post_meta($campaign_id, '_human_camp_status', true);
-        if ($camp_status === 'completed' || $camp_status === 'cancelled') {
+        $camp_is_sample = get_post_meta($campaign_id, '_human_is_sample', true) === '1';
+        if ($camp_is_sample) {
+            $readiness['sections']['campaign']['warnings'][] = 'Associated Campaign is sample/reference data and cannot be automated';
+            $camp_score = 5;
+        } elseif ($camp_status === 'completed' || $camp_status === 'cancelled' || $camp_status === 'archived') {
             $readiness['sections']['campaign']['warnings'][] = 'Associated campaign is ' . $camp_status;
             $camp_score = 5;
         }
@@ -247,7 +256,9 @@ function human_get_post_marketing_readiness($post_id) {
     $total_score = $content_score + $seo_score + $social_score + $conv_score + $camp_score + $lifecycle_score;
     $readiness['score'] = $total_score;
 
-    if ($total_score >= 90 && empty($readiness['sections']['conversion']['warnings'])) {
+    if ($is_sample_content) {
+        $readiness['state'] = 'SAMPLE / REFERENCE — NOT AUTOMATION ELIGIBLE';
+    } elseif ($total_score >= 90 && empty($readiness['sections']['conversion']['warnings'])) {
         $readiness['state'] = 'MARKETING READY';
     } elseif ($total_score > 50) {
         $readiness['state'] = 'NEEDS ATTENTION';
@@ -377,4 +388,80 @@ function human_get_support_readiness() {
     }
 
     return human_readiness_result($blockers);
+}
+
+/**
+ * Campaign automation readiness.
+ *
+ * This does not publish anything. It provides a strict export gate for future
+ * connectors. Sample/reference Campaigns are always blocked.
+ */
+function human_get_campaign_readiness($campaign_id) {
+    $post = get_post($campaign_id);
+    $blockers = array();
+
+    if (!$post || $post->post_type !== 'human_campaign') {
+        $blockers['INVALID_CAMPAIGN'] = 'A valid Human Campaign is required.';
+        return array(
+            'ready_for_automation' => false,
+            'blocker_codes' => array_keys($blockers),
+            'blocker_messages' => array_values($blockers),
+        );
+    }
+
+    $is_sample = get_post_meta($campaign_id, '_human_is_sample', true) === '1';
+    $approval_state = (string) get_post_meta($campaign_id, '_human_camp_approval_state', true);
+    $automation_eligible = get_post_meta($campaign_id, '_human_camp_automation_eligible', true) === '1';
+    $status = (string) get_post_meta($campaign_id, '_human_camp_status', true);
+    $objective = trim((string) get_post_meta($campaign_id, '_human_camp_objective', true));
+    $target_url = trim((string) get_post_meta($campaign_id, '_human_camp_target_url', true));
+    $utm_source = trim((string) get_post_meta($campaign_id, '_human_camp_utm_source', true));
+    $utm_medium = trim((string) get_post_meta($campaign_id, '_human_camp_utm_medium', true));
+    $utm_campaign = trim((string) get_post_meta($campaign_id, '_human_camp_utm_campaign', true));
+    $facebook_copy = trim((string) get_post_meta($campaign_id, '_human_camp_facebook_copy', true));
+    $instagram_copy = trim((string) get_post_meta($campaign_id, '_human_camp_instagram_copy', true));
+
+    if ($is_sample) {
+        $blockers['SAMPLE_CAMPAIGN'] = 'Sample/reference Campaigns can never be automation eligible.';
+    }
+    if ($approval_state !== 'approved') {
+        $blockers['CAMPAIGN_NOT_APPROVED'] = 'Campaign approval state must be approved.';
+    }
+    if (!$automation_eligible) {
+        $blockers['AUTOMATION_NOT_ENABLED'] = 'Automation eligible is not enabled.';
+    }
+    if (!in_array($status, array('planned', 'active'), true)) {
+        $blockers['CAMPAIGN_STATUS_BLOCKED'] = 'Campaign status must be Planned or Active.';
+    }
+    if ($objective === '') {
+        $blockers['MISSING_OBJECTIVE'] = 'Campaign objective is required.';
+    }
+    if ($target_url === '') {
+        $blockers['MISSING_TARGET_URL'] = 'Campaign target URL is required.';
+    } else {
+        $valid_target = false;
+        if (strpos($target_url, '/') === 0 && strpos($target_url, '//') !== 0) {
+            $valid_target = true;
+        } else {
+            $parts = wp_parse_url($target_url);
+            $valid_target = is_array($parts)
+                && strtolower($parts['scheme'] ?? '') === 'https'
+                && strtolower($parts['host'] ?? '') === 'humanv1.com';
+        }
+        if (!$valid_target) {
+            $blockers['INVALID_TARGET_URL'] = 'Campaign target must be a local path or an HTTPS humanv1.com URL.';
+        }
+    }
+    if ($utm_source === '' || $utm_medium === '' || $utm_campaign === '') {
+        $blockers['INCOMPLETE_UTM'] = 'UTM source, medium and campaign values are required.';
+    }
+    if ($facebook_copy === '' && $instagram_copy === '') {
+        $blockers['MISSING_SOCIAL_COPY'] = 'At least one social copy variant is required.';
+    }
+
+    return array(
+        'ready_for_automation' => empty($blockers),
+        'blocker_codes' => array_keys($blockers),
+        'blocker_messages' => array_values($blockers),
+    );
 }

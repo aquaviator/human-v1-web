@@ -166,7 +166,7 @@ function human_render_marketing_details_meta_box($post) {
 
     $apps = get_posts(array('post_type' => 'human_app', 'numberposts' => -1, 'post_status' => 'publish'));
     $ctas = get_posts(array('post_type' => 'human_cta', 'numberposts' => -1, 'post_status' => 'publish'));
-    $campaigns = get_posts(array('post_type' => 'human_campaign', 'numberposts' => -1, 'post_status' => 'publish'));
+    $campaigns = get_posts(array('post_type' => 'human_campaign', 'numberposts' => -1, 'post_status' => array('publish', 'draft')));
 
     $status_class = 'status-incomplete';
     if ($readiness['state'] === 'MARKETING READY') $status_class = 'status-ready';
@@ -369,8 +369,11 @@ function human_render_marketing_details_meta_box($post) {
                         <label for="human_post_primary_campaign">Associated Campaign</label>
                         <select id="human_post_primary_campaign" name="_human_post_primary_campaign">
                             <option value="">None (Evergreen / BAU)</option>
-                            <?php foreach ($campaigns as $camp) : ?>
-                                <option value="<?php echo esc_attr($camp->ID); ?>" <?php selected($primary_campaign, $camp->ID); ?>><?php echo esc_html($camp->post_title); ?></option>
+                            <?php foreach ($campaigns as $camp) :
+                                $camp_is_sample = get_post_meta($camp->ID, '_human_is_sample', true) === '1';
+                                $camp_label = $camp->post_title . ($camp_is_sample ? ' [SAMPLE]' : '');
+                            ?>
+                                <option value="<?php echo esc_attr($camp->ID); ?>" <?php selected($primary_campaign, $camp->ID); ?>><?php echo esc_html($camp_label); ?></option>
                             <?php endforeach; ?>
                         </select>
                         <?php if ($primary_campaign): ?>

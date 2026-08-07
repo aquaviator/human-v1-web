@@ -69,6 +69,15 @@ function human_render_campaign_details_meta_box($post) {
     $primary_cta = get_post_meta($post->ID, '_human_camp_primary_cta', true);
     $utm_id = get_post_meta($post->ID, '_human_camp_utm_id', true);
     $priority = get_post_meta($post->ID, '_human_camp_priority', true);
+    $is_sample = get_post_meta($post->ID, '_human_is_sample', true) === '1';
+    $approval_state = get_post_meta($post->ID, '_human_camp_approval_state', true) ?: 'draft';
+    $automation_eligible = get_post_meta($post->ID, '_human_camp_automation_eligible', true) === '1';
+    $target_url = get_post_meta($post->ID, '_human_camp_target_url', true);
+    $utm_source = get_post_meta($post->ID, '_human_camp_utm_source', true);
+    $utm_medium = get_post_meta($post->ID, '_human_camp_utm_medium', true);
+    $utm_campaign = get_post_meta($post->ID, '_human_camp_utm_campaign', true);
+    $facebook_copy = get_post_meta($post->ID, '_human_camp_facebook_copy', true);
+    $instagram_copy = get_post_meta($post->ID, '_human_camp_instagram_copy', true);
 
     $apps = get_posts(array('post_type' => 'human_app', 'numberposts' => -1, 'post_status' => 'publish'));
     $ctas = get_posts(array('post_type' => 'human_cta', 'numberposts' => -1, 'post_status' => 'publish'));
@@ -127,23 +136,150 @@ function human_render_campaign_details_meta_box($post) {
                 <?php endforeach; ?>
             </select>
         </div>
+        <div>
+            <label for="human_camp_approval_state"><strong><?php _e('Approval State', 'human-platform'); ?></strong></label>
+            <select id="human_camp_approval_state" name="_human_camp_approval_state" class="widefat">
+                <option value="draft" <?php selected($approval_state, 'draft'); ?>>Draft</option>
+                <option value="in_review" <?php selected($approval_state, 'in_review'); ?>>In Review</option>
+                <option value="approved" <?php selected($approval_state, 'approved'); ?>>Approved</option>
+            </select>
+        </div>
+        <div>
+            <label for="human_camp_target_url"><strong><?php _e('Target URL', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_camp_target_url" name="_human_camp_target_url" value="<?php echo esc_attr($target_url); ?>" class="widefat" placeholder="/strength/">
+        </div>
+        <div>
+            <label for="human_camp_utm_source"><strong><?php _e('UTM Source', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_camp_utm_source" name="_human_camp_utm_source" value="<?php echo esc_attr($utm_source); ?>" class="widefat" placeholder="facebook">
+        </div>
+        <div>
+            <label for="human_camp_utm_medium"><strong><?php _e('UTM Medium', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_camp_utm_medium" name="_human_camp_utm_medium" value="<?php echo esc_attr($utm_medium); ?>" class="widefat" placeholder="social">
+        </div>
+        <div>
+            <label for="human_camp_utm_campaign"><strong><?php _e('UTM Campaign', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_camp_utm_campaign" name="_human_camp_utm_campaign" value="<?php echo esc_attr($utm_campaign); ?>" class="widefat" placeholder="human_strength_internal_testing">
+        </div>
+        <div style="grid-column:1 / -1;">
+            <label for="human_camp_facebook_copy"><strong><?php _e('Facebook Reference Copy', 'human-platform'); ?></strong></label>
+            <textarea id="human_camp_facebook_copy" name="_human_camp_facebook_copy" rows="3" class="widefat"><?php echo esc_textarea($facebook_copy); ?></textarea>
+        </div>
+        <div style="grid-column:1 / -1;">
+            <label for="human_camp_instagram_copy"><strong><?php _e('Instagram Reference Copy', 'human-platform'); ?></strong></label>
+            <textarea id="human_camp_instagram_copy" name="_human_camp_instagram_copy" rows="3" class="widefat"><?php echo esc_textarea($instagram_copy); ?></textarea>
+        </div>
+        <div style="grid-column:1 / -1;display:flex;gap:2rem;align-items:center;padding-top:8px;">
+            <label>
+                <input type="checkbox" name="_human_is_sample" value="1" <?php checked($is_sample); ?>>
+                <strong><?php _e('Sample / reference Campaign', 'human-platform'); ?></strong>
+            </label>
+            <label>
+                <input type="checkbox" name="_human_camp_automation_eligible" value="1" <?php checked($automation_eligible); ?> <?php disabled($is_sample); ?>>
+                <strong><?php _e('Automation eligible', 'human-platform'); ?></strong>
+            </label>
+        </div>
+        <?php if ($is_sample): ?>
+            <p style="grid-column:1 / -1;margin:0;color:#646970;">
+                <?php _e('Sample Campaigns are always forced to draft approval and automation eligible = No when saved.', 'human-platform'); ?>
+            </p>
+        <?php endif; ?>
+        <?php if (function_exists('human_get_campaign_readiness')): $campaign_readiness = human_get_campaign_readiness($post->ID); ?>
+            <div style="grid-column:1 / -1;padding:12px;border:1px solid #dcdcde;background:#fff;">
+                <strong><?php echo !empty($campaign_readiness['ready_for_automation']) ? 'Automation Readiness: READY' : 'Automation Readiness: BLOCKED'; ?></strong>
+                <?php if (!empty($campaign_readiness['blocker_messages'])): ?>
+                    <ul style="margin-bottom:0;">
+                        <?php foreach ($campaign_readiness['blocker_messages'] as $message): ?>
+                            <li><?php echo esc_html($message); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
     <?php
 }
 
 function human_save_campaign_meta_boxes($post_id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
-    if (!isset($_POST['human_campaign_meta_nonce']) || !wp_verify_nonce($_POST['human_campaign_meta_nonce'], 'human_campaign_meta_nonce_action')) return;
+    if (!isset($_POST['human_campaign_meta_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['human_campaign_meta_nonce'])), 'human_campaign_meta_nonce_action')) return;
     if (!current_user_can('edit_post', $post_id)) return;
     if (get_post_type($post_id) !== 'human_campaign') return;
 
-    $fields = array('_human_camp_objective', '_human_camp_start_date', '_human_camp_end_date', '_human_camp_status', '_human_camp_utm_id', '_human_camp_priority');
-    foreach ($fields as $field) {
+    $allowed_statuses = array('draft', 'planned', 'active', 'paused', 'completed', 'archived');
+    $allowed_priorities = array('low', 'normal', 'high');
+    $allowed_approval_states = array('draft', 'in_review', 'approved');
+
+    $single_line_fields = array(
+        '_human_camp_objective',
+        '_human_camp_utm_id',
+        '_human_camp_target_url',
+        '_human_camp_utm_source',
+        '_human_camp_utm_medium',
+        '_human_camp_utm_campaign',
+    );
+    foreach ($single_line_fields as $field) {
         if (isset($_POST[$field])) {
-            update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+            update_post_meta($post_id, $field, sanitize_text_field(wp_unslash($_POST[$field])));
         }
     }
-    
+
+    foreach (array('_human_camp_facebook_copy', '_human_camp_instagram_copy') as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, $field, sanitize_textarea_field(wp_unslash($_POST[$field])));
+        }
+    }
+
+    foreach (array('_human_camp_start_date', '_human_camp_end_date') as $field) {
+        if (!isset($_POST[$field])) {
+            continue;
+        }
+        $date = sanitize_text_field(wp_unslash($_POST[$field]));
+        if ($date === '') {
+            update_post_meta($post_id, $field, '');
+            continue;
+        }
+        $parsed = DateTime::createFromFormat('!Y-m-d', $date);
+        if ($parsed && $parsed->format('Y-m-d') === $date) {
+            update_post_meta($post_id, $field, $date);
+        }
+    }
+
+    if (isset($_POST['_human_camp_status'])) {
+        $status = sanitize_key(wp_unslash($_POST['_human_camp_status']));
+        if (in_array($status, $allowed_statuses, true)) {
+            update_post_meta($post_id, '_human_camp_status', $status);
+        }
+    }
+
+    if (isset($_POST['_human_camp_priority'])) {
+        $priority = sanitize_key(wp_unslash($_POST['_human_camp_priority']));
+        if (in_array($priority, $allowed_priorities, true)) {
+            update_post_meta($post_id, '_human_camp_priority', $priority);
+        }
+    }
+
+    $approval_state = isset($_POST['_human_camp_approval_state'])
+        ? sanitize_key(wp_unslash($_POST['_human_camp_approval_state']))
+        : 'draft';
+    if (!in_array($approval_state, $allowed_approval_states, true)) {
+        $approval_state = 'draft';
+    }
+
+    $is_sample = isset($_POST['_human_is_sample']) ? '1' : '0';
+    $automation_eligible = isset($_POST['_human_camp_automation_eligible']) ? '1' : '0';
+
+    if ($is_sample === '1') {
+        $approval_state = 'draft';
+        $automation_eligible = '0';
+    }
+    if ($approval_state !== 'approved') {
+        $automation_eligible = '0';
+    }
+
+    update_post_meta($post_id, '_human_is_sample', $is_sample);
+    update_post_meta($post_id, '_human_camp_approval_state', $approval_state);
+    update_post_meta($post_id, '_human_camp_automation_eligible', $automation_eligible);
+
     // Validate relations as integers
     $relation_fields = array('_human_camp_associated_app', '_human_camp_primary_cta');
     foreach ($relation_fields as $field) {
@@ -164,6 +300,9 @@ function human_campaign_columns($columns) {
         'title' => __('Campaign Name', 'human-platform'),
         'product' => __('Product', 'human-platform'),
         'status' => __('Status', 'human-platform'),
+        'sample' => __('Sample', 'human-platform'),
+        'approval' => __('Approval', 'human-platform'),
+        'automation' => __('Automation', 'human-platform'),
         'start' => __('Start Date', 'human-platform'),
         'end' => __('End Date', 'human-platform'),
         'cta' => __('CTA', 'human-platform'),
@@ -183,6 +322,15 @@ function human_campaign_custom_column($column, $post_id) {
         case 'status':
             $status = get_post_meta($post_id, '_human_camp_status', true);
             echo esc_html(ucfirst($status));
+            break;
+        case 'sample':
+            echo get_post_meta($post_id, '_human_is_sample', true) === '1' ? 'Yes' : 'No';
+            break;
+        case 'approval':
+            echo esc_html(ucwords(str_replace('_', ' ', (string) get_post_meta($post_id, '_human_camp_approval_state', true))));
+            break;
+        case 'automation':
+            echo get_post_meta($post_id, '_human_camp_automation_eligible', true) === '1' ? 'Eligible' : 'Blocked';
             break;
         case 'start':
             $start = get_post_meta($post_id, '_human_camp_start_date', true);

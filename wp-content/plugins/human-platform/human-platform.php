@@ -4,7 +4,7 @@
  * Plugin URI: https://humanv1.com
  * Description: Core platform functionality for the Human ecosystem. Registers Human Apps CPT, app status taxonomies, REST API endpoints, and hooks for future human-marketing extension.
  * Version: 1.0.0
- * Author: Human Performance Technology
+ * Author: Human V1
  * Text Domain: human-platform
  * Requires PHP: 8.2
  */

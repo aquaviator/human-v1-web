@@ -11,219 +11,199 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Returns the 10 Cornerstone Launch Articles Definition
+ * Returns the current Human Journal reference content definitions.
+ *
+ * These definitions are deliberately restrained. They are used for fresh installs
+ * and for the 1.5.0 reconciliation migration. Only the first article is intended
+ * to be published automatically, and only when the stock WordPress "Hello world!"
+ * post is still untouched. The remaining entries are reference/sample drafts.
  */
 function human_get_cornerstone_articles() {
     return array(
         array(
-            'slug'          => 'how-to-track-strength-training-progress-properly',
-            'title'         => 'How to Track Strength Training Progress Properly',
-            'category'      => 'Strength Training',
-            'author'        => 'Human Editorial Team',
-            'date'          => '2026-07-20',
-            'excerpt'       => 'Most lifters track weight and reps, but miss total tonnage, set velocity, and progressive volume trends over time. Here is the structured approach to tracking real strength gains.',
-            'target_intent' => 'strength training progress, track strength gains, workout tracking guide',
-            'seo_title'     => 'How to Track Strength Training Progress Properly | Human Journal',
-            'seo_desc'      => 'Learn how to accurately track strength training progress beyond arbitrary weight numbers. Discover volume metrics, estimated 1RM, and local logging strategies.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>The Common Fallacy of Workout Tracking</h2>
-<p>Tracking your strength training sounds simple: write down the weight you lifted and how many times you lifted it. Yet thousands of lifters hit plateaus despite diligently recording every session. Why? Because recording raw numbers without understanding volume distribution, rep quality, or progressive overload metrics provides data without context.</p>
+            'seed_key'      => 'journal_why_human_v1_begins_with_strength_v1',
+            'slug'          => 'why-human-v1-begins-with-strength',
+            'title'         => 'Why Human V1 Begins with Strength',
+            'status'        => 'publish',
+            'category'      => 'Human V1',
+            'excerpt'       => 'Human Strength is the first Human V1 product. Here is why the platform begins with a focused Android strength-training application before expanding into future disciplines.',
+            'target_intent' => 'human v1 strength app, human strength internal testing',
+            'seo_title'     => 'Why Human V1 Begins with Strength | Human Journal',
+            'seo_desc'      => 'Human Strength is the first Human V1 product and is currently in Google Play Internal Testing. Learn how it fits into the wider Human V1 platform.',
+            'social_title'  => 'Why Human V1 Begins with Strength',
+            'social_desc'   => 'Human Strength is the first Human V1 product and is currently in Google Play Internal Testing. The wider platform will grow from this focused starting point.',
+            'promo_copy'    => 'Human V1 begins with one focused product: Human Strength. It is currently in Google Play Internal Testing, while the wider Human V1 platform remains a longer-term roadmap.',
+            'primary_topic' => 'Human V1',
+            'search_intent' => 'informational',
+            'content_type'  => 'platform_update',
+            'evergreen'     => '1',
+            'primary_app_slug' => 'strength',
+            'primary_cta_title' => 'Explore Human Strength',
+            'campaign_seed_key' => 'campaign_why_strength_first_v1',
+            'content'       => '<h2>Start With One Product and Make It Useful</h2>
+<p>Human V1 means Human Version 1.0. The platform begins with Human Strength, an Android strength-training application currently in Google Play Internal Testing.</p>
+<p>The aim is deliberately focused: build a useful first product, learn from real use, and create a sound foundation before expanding into additional Human V1 applications.</p>
 
-<h3>1. Total Tonnage vs. Effective Volume</h3>
-<p>Tonnage (Load × Reps × Sets) offers a macro view of workload. However, not all tonnage is created equal. Moving 10,000 kg across 20 easy sets is neuro-muscularly distinct from moving 10,000 kg across 5 hard, high-stimulus sets near failure. Proper progress tracking isolates working sets performed within target RPE (Rating of Perceived Exertion) brackets.</p>
+<h2>Human Strength Comes First</h2>
+<p>Human Strength is the first product in the Human V1 platform. It is designed around strength-training workflows such as recording workouts, routines, sets and progression while keeping normal training use reliable on Android.</p>
+<p>Google Sign-In is required for Human V1 account access. Introductory Human V1 account access is separate from any paid Google Play membership. Human Strength paid membership is planned around an annual Google Play purchase when offered.</p>
 
-<h3>2. The Role of Estimated 1RM Progression</h3>
-<p>You do not need to test a true 1-Rep Max every week to know if you are getting stronger. Using validated submaximal formulas (such as Brzycki or Epley formulas), estimated 1RM (e1RM) calculations provide a clean rolling benchmark across varying rep ranges.</p>
+<h2>What Comes After Strength?</h2>
+<p>The wider Human V1 roadmap includes future products for Running, HIIT, Mobility, Recovery, Nutrition and Community. Human Coach is marked Coming Soon. Features and release dates for those future products have not been announced.</p>
 
-<h3>3. Standardising Execution and Range of Motion</h3>
-<p>Data is useless if the measurement criteria change. Halving your squat depth to add 20kg to the bar is false progress. Reliable strength tracking requires standardized tempo, pause duration, and range of motion across workouts.</p>
+<h2>Why This Matters</h2>
+<p>Starting with one product keeps the public promise clear. Human V1 can build from what actually exists rather than describing future ideas as finished capabilities.</p>
 
-<div class="journal-cta-box" style="background:var(--human-dark-surface);border:1px solid var(--human-border-dark);border-radius:12px;padding:2rem;margin:2.5rem 0;text-align:center;">
-    <span class="eyebrow">BUILT FOR REAL TRACKING</span>
-    <h3 style="margin-bottom:0.75rem;color:var(--human-white);">Track Your Strength Progression With Human Strength</h3>
-    <p style="color:#94A3B8;margin-bottom:1.5rem;font-size:0.95rem;">Experience offline-first logging with automatic tonnage analytics, e1RM curves, and local Room DB performance on Android.</p>
-    <a href="/strength" class="btn btn-primary">Explore Human Strength &rarr;</a>
-</div>'
+<p><a href="/strength/">Learn more about Human Strength</a></p>'
         ),
         array(
-            'slug'          => 'progressive-overload-what-it-actually-means-and-how-to-track-it',
-            'title'         => 'Progressive Overload: What It Actually Means and How to Track It',
-            'category'      => 'Programming',
-            'author'        => 'Human Performance Science',
-            'date'          => '2026-07-21',
-            'excerpt'       => 'Progressive overload is not just putting more weight on the bar every week. Discover the 5 mechanisms of progressive overload and how to measure them systematically.',
-            'target_intent' => 'progressive overload guide, how to track progressive overload, strength programming',
-            'seo_title'     => 'Progressive Overload: What It Actually Means & How to Track It',
-            'seo_desc'      => 'Unpack the 5 mechanisms of progressive overload. Learn how to track reps, density, range of motion, and load systematically for continuous strength adaptation.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>Beyond Adding Weight to the Bar</h2>
-<p>Progressive overload is the fundamental physiological rule governing strength and muscular adaptation. Simply stated: to trigger adaptation, you must subject the body to unaccustomed mechanical stress. However, many lifters erroneously equate progressive overload solely with adding resistance to the barbell.</p>
+            'seed_key'      => 'journal_how_human_strength_access_works_v1',
+            'slug'          => 'how-human-strength-access-works',
+            'title'         => 'How Human Strength Access Works',
+            'status'        => 'draft',
+            'category'      => 'Human Strength',
+            'excerpt'       => 'A plain-English explanation of Human V1 account access, Google Sign-In, Internal Testing and the separate Google Play membership.',
+            'target_intent' => 'human strength access, human strength membership',
+            'seo_title'     => 'How Human Strength Access Works | Human Journal',
+            'seo_desc'      => 'Understand Human Strength access: Google Sign-In, Human V1 introductory account access, Google Play Internal Testing and separate paid membership.',
+            'social_title'  => 'How Human Strength Access Works',
+            'social_desc'   => 'Google Sign-In, Human V1 account access, Internal Testing and paid Google Play membership are separate parts of the Human Strength access flow.',
+            'promo_copy'    => 'Human Strength access has a few distinct parts. Google Sign-In creates the account relationship, introductory Human V1 access is separate from paid membership, and the app is currently in Internal Testing.',
+            'primary_topic' => 'Human Strength access',
+            'search_intent' => 'informational',
+            'content_type'  => 'product_guide',
+            'evergreen'     => '1',
+            'primary_app_slug' => 'strength',
+            'primary_cta_title' => 'Explore Human Strength',
+            'campaign_seed_key' => 'campaign_strength_access_explainer_v1',
+            'content'       => '<h2>Human Strength Is Currently in Internal Testing</h2>
+<p>Human Strength is not currently presented as a general public Google Play release. Access is limited to eligible or invited testers through Google Play Internal Testing.</p>
 
-<h3>The 5 Dimension of Progressive Overload</h3>
-<ul>
-    <li><strong>1. Load Progression:</strong> Increasing total weight lifted while keeping reps and execution identical.</li>
-    <li><strong>2. Repetition Progression:</strong> Completing more repetitions with identical load and mechanics.</li>
-    <li><strong>3. Volume Progression:</strong> Adding working sets per muscle group per microcycle.</li>
-    <li><strong>4. Density Progression:</strong> Completing identical work in less time by compressing rest intervals systematically.</li>
-    <li><strong>5. Technical & Mechanical Progression:</strong> Improving movement efficiency, controlling tempo, or expanding range of motion.</li>
-</ul>
+<h2>Google Sign-In and the Human V1 Account</h2>
+<p>Google Sign-In is required for Human V1 account access. The Human V1 account relationship and its introductory access period are separate from Google Play billing.</p>
 
-<h3>How to Log Overload Systematically</h3>
-<p>In Human Strength, double progression models are natively supported. You select a target rep range (e.g., 6–8 reps). Once you hit the top of the range across all target sets with clean technique, the system prompts a structured load increment for the subsequent microcycle.</p>'
+<h2>Paid Membership Is Separate</h2>
+<p>A paid Human Strength membership is handled through Google Play when offered. The current annual membership price is £24 per year. Introductory Human V1 account access does not automatically convert into a paid Google Play membership.</p>
+
+<h2>Why the Distinction Matters</h2>
+<p>Keeping account access and paid entitlement separate makes the product status easier to understand and avoids describing Human V1 account access as a Google Play free trial.</p>'
         ),
         array(
-            'slug'          => 'why-logging-your-workouts-changes-the-way-you-train',
-            'title'         => 'Why Logging Your Workouts Changes the Way You Train',
-            'category'      => 'Consistency',
-            'author'        => 'Human Editorial Team',
-            'date'          => '2026-07-22',
-            'excerpt'       => 'Relying on memory leads to junk volume and ego lifting. Here is how structured workout logging creates psychological accountability and objective training clarity.',
-            'target_intent' => 'why log workouts, gym workout log benefit, strength training tracking',
-            'seo_title'     => 'Why Logging Your Workouts Changes the Way You Train | Human',
-            'seo_desc'      => 'Explore the psychological and biomechanical benefits of structured workout logging. Avoid ego lifting and maintain clear training direction.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>The Cognitive Friction of Memory-Based Training</h2>
-<p>When you walk into the gym without a precise record of your previous performance, your brain relies on approximate memory. You guess what weight you lifted last week, estimate your rest periods, and subjectively decide when a set feels "hard enough". This ambiguity breeds ego lifting or inadvertent under-training.</p>
+            'seed_key'      => 'journal_human_strength_internal_testing_v1',
+            'slug'          => 'human-strength-internal-testing-what-it-means',
+            'title'         => 'Human Strength Internal Testing: What It Means',
+            'status'        => 'draft',
+            'category'      => 'Human Strength',
+            'excerpt'       => 'Human Strength is currently in Google Play Internal Testing. This reference article explains what that status means for public website copy and access.',
+            'target_intent' => 'human strength internal testing',
+            'seo_title'     => 'Human Strength Internal Testing: What It Means',
+            'seo_desc'      => 'Human Strength is currently in Google Play Internal Testing. Learn what that status means for testers, public availability and website messaging.',
+            'social_title'  => 'Human Strength Is in Internal Testing',
+            'social_desc'   => 'Human Strength is currently in Google Play Internal Testing for eligible or invited testers. It is not yet described as a general public Play Store release.',
+            'promo_copy'    => 'Human Strength is in Google Play Internal Testing. That means tester access is real, but general public availability is not being claimed yet.',
+            'primary_topic' => 'Google Play Internal Testing',
+            'search_intent' => 'informational',
+            'content_type'  => 'product_update',
+            'evergreen'     => '0',
+            'primary_app_slug' => 'strength',
+            'primary_cta_title' => 'Explore Human Strength',
+            'campaign_seed_key' => 'campaign_strength_internal_testing_v1',
+            'content'       => '<h2>Internal Testing Is a Real Product Stage</h2>
+<p>Human Strength is currently distributed through Google Play Internal Testing. That allows eligible or invited testers to use the Android application while the product remains outside a general public release.</p>
 
-<h3>Eliminating Guesswork at the Rack</h3>
-<p>Having your previous log instantly visible before starting a set changes your psychological state. You know exactly what number you need to match or exceed. Every set becomes a focused objective rather than a casual exercise routine.</p>'
+<h2>What the Website Should Say</h2>
+<p>Public Human V1 content should describe Human Strength as being in Internal Testing. It should not use a general Download on Google Play message unless a public listing is genuinely available and the product lifecycle has changed.</p>
+
+<h2>What Testers Can Expect</h2>
+<p>Test access depends on the Google Play testing configuration associated with the application. Human V1 should only publish a tester link when a verified Internal Testing URL is configured.</p>
+
+<h2>What Happens Next?</h2>
+<p>A future public release is a separate lifecycle decision. Until then, Internal Testing remains the truthful public status.</p>'
         ),
         array(
-            'slug'          => 'sets-reps-load-and-volume-understanding-your-strength-training-data',
-            'title'         => 'Sets, Reps, Load and Volume: Understanding Your Strength Training Data',
-            'category'      => 'Workout Tracking',
-            'author'        => 'Human Research Team',
-            'date'          => '2026-07-23',
-            'excerpt'       => 'A technical deep-dive into training variables: working sets, volume load, average intensity, and set-equated volume for strength and hypertrophy.',
-            'target_intent' => 'strength training data, volume load formula, training variables analytics',
-            'seo_title'     => 'Sets, Reps, Load & Volume: Demystifying Strength Data | Human',
-            'seo_desc'      => 'Master the math of strength training data. Learn how working sets, volume load, and relative intensity drive neural and hypertrophy adaptations.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>Decoding Training Variables</h2>
-<p>To optimize training outcomes, you must treat your workout log as performance data. Here are the primary metrics that govern training adaptation:</p>
+            'seed_key'      => 'journal_what_human_v1_means_v1',
+            'slug'          => 'what-human-v1-version-1-0-means',
+            'title'         => 'What Human V1 Means',
+            'status'        => 'draft',
+            'category'      => 'Human V1',
+            'excerpt'       => 'Human V1 means Human Version 1.0. This reference article explains the platform idea without turning future product plans into present-day claims.',
+            'target_intent' => 'what is human v1',
+            'seo_title'     => 'What Human V1 Means | Human Journal',
+            'seo_desc'      => 'Human V1 means Human Version 1.0: the platform behind Human Strength and future Human applications, with Human Strength as the first product.',
+            'social_title'  => 'What Does Human V1 Mean?',
+            'social_desc'   => 'Human V1 means Human Version 1.0. Human Strength is the first product, while the wider Human V1 roadmap remains a set of future products and ideas.',
+            'promo_copy'    => 'Human V1 means Human Version 1.0: start with a useful first product, be truthful about what exists today, and grow the wider platform from there.',
+            'primary_topic' => 'Human V1',
+            'search_intent' => 'informational',
+            'content_type'  => 'platform_guide',
+            'evergreen'     => '1',
+            'primary_app_slug' => '',
+            'primary_cta_title' => '',
+            'campaign_seed_key' => 'campaign_human_v1_brand_intro_v1',
+            'content'       => '<h2>Human Version 1.0</h2>
+<p>Human V1 is shorthand for Human Version 1.0. It is the platform identity behind Human Strength and future Human applications.</p>
 
-<h3>1. Working Sets per Muscle Group</h3>
-<p>Research consistently highlights direct working sets per week (sets taken within 1–3 reps of failure) as the primary proxy for hypertrophy stimulus.</p>
+<h2>The First Product Is Human Strength</h2>
+<p>Human Strength is the first Human V1 product and is currently in Google Play Internal Testing.</p>
 
-<h3>2. Volume Load (Tonnage)</h3>
-<p>Calculated as <code>Load × Reps × Sets</code>. Useful for comparing session density across identical exercises over time.</p>
+<h2>The Wider Roadmap</h2>
+<p>Human Running, Human HIIT, Human Mobility, Human Recovery, Human Nutrition and Human Community are future products. Human Coach is marked Coming Soon. Their detailed features and release timing have not been announced.</p>
 
-<h3>3. Average Relative Intensity (% 1RM)</h3>
-<p>Understanding average percentage of 1RM ensures you remain in the target neurological zone for peak force production.</p>'
-        ),
-        array(
-            'slug'          => 'how-to-build-a-strength-training-routine-you-can-actually-follow',
-            'title'         => 'How to Build a Strength Training Routine You Can Actually Follow',
-            'category'      => 'Programming',
-            'author'        => 'Human Editorial Team',
-            'date'          => '2026-07-24',
-            'excerpt'       => 'The best routine is not the most complex one — it is the one you can execute consistently. Learn how to structure splits, supersets, and rest periods for longevity.',
-            'target_intent' => 'build strength routine, routine structure guide, workout program design',
-            'seo_title'     => 'How to Build a Strength Training Routine You Can Follow',
-            'seo_desc'      => 'Learn how to construct a practical, high-yield strength routine based on frequency, movement patterns, and sustainable time budgets.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>Designing for Real Life</h2>
-<p>Overly complex 6-day bodypart splits fail when life intervenes. Sustainable strength routine design starts with realistic time availability and movement balance rather than idealistic bodybuilding templates.</p>
-
-<h3>Key Design Pillars</h3>
-<ul>
-    <li><strong>1. Frequency over Duration:</strong> 3–4 focused 45-minute sessions out-perform 2 chaotic 2-hour sessions.</li>
-    <li><strong>2. Movement Pattern Balance:</strong> Pair horizontal push with horizontal pull; knee-dominant with hip-dominant movements.</li>
-    <li><strong>3. Smart Supersetting:</strong> Group non-competing muscle groups (e.g., Antagonist paired sets) to compress session time without compromising motor unit recruitment.</li>
-</ul>'
-        ),
-        array(
-            'slug'          => 'training-consistency-why-your-workout-history-matters',
-            'title'         => 'Training Consistency: Why Your Workout History Matters',
-            'category'      => 'Consistency',
-            'author'        => 'Human Research Team',
-            'date'          => '2026-07-24',
-            'excerpt'       => 'Strength adaptation is a multi-year compounding curve. Why maintaining a continuous historical record unlocks long-term trend analysis and fatigue prevention.',
-            'target_intent' => 'workout history benefits, training consistency, long term strength progress',
-            'seo_title'     => 'Training Consistency: Why Your Workout History Matters',
-            'seo_desc'      => 'Discover why multi-year workout history unlocks long-term trend analysis, prevents overtraining, and keeps your training trajectory compounding.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>The Power of Compounding Workout History</h2>
-<p>Short-term progress is noisy. Deloads, fatigue, and life stress cause week-to-week fluctuations. Looking back at 6 to 12 months of structured workout data reveals the true macro trajectory of your strength development.</p>
-
-<h3>Preventing Overtraining & Deload Timing</h3>
-<p>By reviewing long-term volume curves alongside body weight and joint comfort notes, you can spot fatigue accumulation weeks before acute injury or burnout occurs.</p>'
-        ),
-        array(
-            'slug'          => 'how-often-should-you-increase-the-weight-you-lift',
-            'title'         => 'How Often Should You Increase the Weight You Lift?',
-            'category'      => 'Programming',
-            'author'        => 'Human Editorial Team',
-            'date'          => '2026-07-25',
-            'excerpt'       => 'When to add weight, when to add reps, and when to hold steady. Understanding training age, linear progression limits, and autoregulated load increments.',
-            'target_intent' => 'when to increase weight lifted, linear progression timing, strength load progression',
-            'seo_title'     => 'How Often Should You Increase the Weight You Lift? | Human',
-            'seo_desc'      => 'Discover when and how frequently to increase training weight based on training age, double progression models, and motor unit adaptation.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>The Frequency of Weight Increments</h2>
-<p>Novices can increase weight on compound lifts almost every session due to rapid neural adaptation. Intermediate and advanced athletes, however, require autoregulated progression strategies such as wave loading or percentage periodization.</p>'
-        ),
-        array(
-            'slug'          => 'workout-tracking-without-the-spreadsheet',
-            'title'         => 'Workout Tracking Without the Spreadsheet',
-            'category'      => 'Workout Tracking',
-            'author'        => 'Human Product Engineering',
-            'date'          => '2026-07-25',
-            'excerpt'       => 'Spreadsheets are powerful for desktop analysis but cumbersome on a gym floor. How purpose-built Android apps streamline live workout logging.',
-            'target_intent' => 'workout tracking app vs spreadsheet, mobile gym log, offline strength app',
-            'seo_title'     => 'Workout Tracking Without the Spreadsheet | Human Strength',
-            'seo_desc'      => 'Ditch clunky spreadsheets on the gym floor. Human Strength brings purpose-built mobile UX, rest timers, and instant volume analytics to Android.',
-            'cta_type'      => 'strength',
-            'content'       => '<h2>Why Spreadsheets Fail in the Gym</h2>
-<p>Excel and Google Sheets are fantastic analytical tools, but pinching and zooming into tiny cells with sweaty hands between heavy sets ruins session momentum. Purpose-built native mobile interfaces eliminate friction while retaining deep mathematical reporting.</p>'
-        ),
-        array(
-            'slug'          => 'what-makes-an-exercise-more-than-just-a-name',
-            'title'         => 'What Makes an Exercise More Than Just a Name?',
-            'category'      => 'Human Ontology',
-            'author'        => 'Human Research Team',
-            'date'          => '2026-07-26',
-            'excerpt'       => 'Introducing the Human Ontology concept. Why viewing exercises as structured knowledge entities unlocks biomechanical substitution and intelligent coaching.',
-            'target_intent' => 'exercise taxonomy, exercise ontology, structured exercise knowledge system',
-            'seo_title'     => 'What Makes an Exercise More Than Just a Name? | Human Ontology',
-            'seo_desc'      => 'Discover why exercises are structured knowledge entities, not simple text labels. Learn how Human Ontology models equipment, biomechanics, and muscle roles.',
-            'cta_type'      => 'ontology',
-            'content'       => '<h2>The Problem With Flat Exercise Libraries</h2>
-<p>When an application stores an exercise simply as a text string like "Incline Dumbbell Press", it lacks understanding. It cannot tell you that an incline dumbbell press shares 80% muscle activation with a low-to-high cable fly, nor can it suggest a machine equivalent when dumbbell racks are crowded.</p>
-
-<h3>Exercises as Multidimensional Knowledge Nodes</h3>
-<p>The Human Ontology models exercises across 15+ dimensions: equipment classification, plane of motion, force direction, primary agonistic muscles, secondary synergists, stabilizing structures, joint actions, and fatigue cost. This knowledge graph forms the intelligence bedrock for the entire Human ecosystem.</p>
-
-<div class="journal-cta-box" style="background:var(--human-dark-surface);border:1px solid var(--human-border-dark);border-radius:12px;padding:2rem;margin:2.5rem 0;text-align:center;">
-    <span class="eyebrow">HUMAN ONTOLOGY PROGRAMME</span>
-    <h3 style="margin-bottom:0.75rem;color:var(--human-white);">Explore The Human Knowledge Engine</h3>
-    <p style="color:#94A3B8;margin-bottom:1.5rem;font-size:0.95rem;">Learn how we are building one of the world\'s largest structured exercise databases to power intelligent adaptation.</p>
-    <a href="/ontology" class="btn btn-secondary">Discover Human Ontology &rarr;</a>
-</div>'
-        ),
-        array(
-            'slug'          => 'building-the-human-ontology-towards-a-structured-exercise-knowledge-system',
-            'title'         => 'Building the Human Ontology: Towards a Structured Exercise Knowledge System',
-            'category'      => 'Human Ontology',
-            'author'        => 'Human Research & Tech Lead',
-            'date'          => '2026-07-26',
-            'excerpt'       => 'An engineering and kinesiology overview of the ambitious Human Ontology programme. Building a multi-product knowledge graph for human performance.',
-            'target_intent' => 'human ontology program, exercise knowledge system, human performance ontology',
-            'seo_title'     => 'Building the Human Ontology: A Structured Exercise Knowledge System',
-            'seo_desc'      => 'An architectural overview of the Human Ontology programme: structuring exercise identity, biomechanics, equipment, and injury contraindications into a global knowledge system.',
-            'cta_type'      => 'ontology',
-            'content'       => '<h2>An Ambitious Long-Term Platform Asset</h2>
-<p>Human is developing a major long-term platform asset: <strong>The Human Ontology</strong>. The objective is to construct one of the world\'s largest, most precise structured exercise knowledge systems.</p>
-
-<h3>Core Architectural Dimensions</h3>
-<ul>
-    <li><strong>Canonical Identity & Aliases:</strong> Cross-referencing regional terminology, international search terms, and colloquial movement names.</li>
-    <li><strong>Biomechanics & Planes of Motion:</strong> Sagittal, frontal, and transverse force vectors, joint rotation angles, and moment arms.</li>
-    <li><strong>Anatomical Muscle Mechanics:</strong> Primary agonists, secondary synergists, dynamic stabilizers, and spinal axial loading indices.</li>
-    <li><strong>Equipment & Environmental Constraints:</strong> Barbells, dumbbells, cables, plate-loaded, selectorised, Smith machines, landmines, and bodyweight variations.</li>
-    <li><strong>Programming & Relationship Graphs:</strong> Movement substitutions, regressions, progressions, and movement-to-movement fatigue transfer.</li>
-</ul>'
+<h2>A Simple Principle</h2>
+<p>The Human V1 website should distinguish clearly between what exists now and what is planned for later. That keeps product communication useful and credible as the platform develops.</p>'
         )
+    );
+}
+
+/**
+ * Exact SHA-256 fingerprints for the original 1.0.0 Journal seed bodies.
+ *
+ * Migration 1.5.0 uses these hashes only to identify untouched historical seed
+ * content. If an editor changed a post, the post is preserved and reported as
+ * a reconciliation conflict.
+ */
+function human_get_legacy_cornerstone_fingerprints() {
+    return array(
+        'how-to-track-strength-training-progress-properly' => array(
+            'content' => '2b803bdaf5b07f9bb1cca69410fba0bdcb43b47c04db6b4e82bfaa545826c1d3',
+            'title' => 'c46998ada0212f26d93778d70adbc16711739da470ce8c84984dbb9aaa9f417a',
+        ),
+        'progressive-overload-what-it-actually-means-and-how-to-track-it' => array(
+            'content' => '167ae1aa3a48ab1348e1145b2f8b3c1e033715ac32edc3fcc869b20aa76f7a48',
+            'title' => 'e509f640c215a9e95ca71c036a373c74ce6dae6a4ddc5930355f281257560300',
+        ),
+        'why-logging-your-workouts-changes-the-way-you-train' => array(
+            'content' => '741cb73ce146da9153a6f96682c217d84b5e3f437e65d07011cbb0345215af49',
+            'title' => '0ce23aa639ad861bd4faa0354d48e1822b3c04805f8baac8b4e1bdc80782559a',
+        ),
+        'sets-reps-load-and-volume-understanding-your-strength-training-data' => array(
+            'content' => '999fba75e4771217ccd66f5b4461ea34da76f6057fd0b73814454fb733b10085',
+            'title' => '909c71c9f46a3f939201da650f0157feeea1251045727cda851b22e37eb07eed',
+        ),
+        'how-to-build-a-strength-training-routine-you-can-actually-follow' => array(
+            'content' => '49baea4fe26be25a0827ed43a249b5c5997c35bc26431a00c40c5dfe5986596f',
+            'title' => '29de957ce67936f16e4c04d7eab46217b59d3240ef91f78fd3e393035911c7ae',
+        ),
+        'training-consistency-why-your-workout-history-matters' => array(
+            'content' => 'bebadc2885783b57ee14ccc2444c6af285fa4e2459ee8cd567823af6e8020511',
+            'title' => '0958e2b76dbc9cfe263c58bcbafbed60cb17c4e347f257f6205a98d040b2a2c2',
+        ),
+        'how-often-should-you-increase-the-weight-you-lift' => array(
+            'content' => '0bf848dcdac295634ec80df0fade31ebb111a0ece38e2b50a30c91a386e80606',
+            'title' => '3317a1858c8b6cbd2242b699454ffa18e3e491ab2771526cdfde0faf9b25f616',
+        ),
+        'workout-tracking-without-the-spreadsheet' => array(
+            'content' => '99881b9b337ee7273103f01bad99a2b995dc5a5ff7d139a0d10959753edc37a8',
+            'title' => '17103dff15104850af086d0b5b5a986c851365bc78de2a801f09b7509b952ea4',
+        ),
+        'what-makes-an-exercise-more-than-just-a-name' => array(
+            'content' => 'b0620cf050538e01dd68b58e10800233de80b5f9e828a3a989c84eeb94056361',
+            'title' => '3f54498bd52f82eecb802689143d7f3d7bc20d4325313f5b4aa8df438ff6833b',
+        ),
+        'building-the-human-ontology-towards-a-structured-exercise-knowledge-system' => array(
+            'content' => 'de33d508329832c3f88a93bc3f24682dedaa385a2c63519e127ac3fc4f029987',
+            'title' => 'c6b783607aeefccb1c6af2c85bb9946cd0af8234b969117a223f72c382736835',
+        ),
     );
 }
 
@@ -262,7 +242,8 @@ function human_run_migrations() {
         '1.1.0' => 'human_migration_1_1_0',
         '1.2.0' => 'human_migration_1_2_0',
         '1.3.0' => 'human_migration_1_3_0',
-        '1.4.0' => 'human_migration_1_4_0'
+        '1.4.0' => 'human_migration_1_4_0',
+        '1.5.0' => 'human_migration_1_5_0'
     );
 
     foreach ($migrations as $version => $callback) {
@@ -355,24 +336,24 @@ function human_migration_1_0_0() {
         array(
             'title' => 'Explore Human Strength',
             'label' => 'Explore Human Strength',
-            'supporting' => 'Learn how our offline-first strength log works.',
-            'url' => '/strength',
+            'supporting' => 'Learn about Human Strength and its current Google Play Internal Testing status.',
+            'url' => '/strength/',
             'type' => 'product',
             'status' => 'active'
         ),
         array(
-            'title' => 'Get Human Strength on Google Play',
-            'label' => 'Download on Google Play',
-            'supporting' => 'Start your 30-day introductory trial today.',
-            'url' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza',
-            'type' => 'download',
+            'title' => 'Human Strength Internal Testing',
+            'label' => 'Internal Testing',
+            'supporting' => 'Access is limited to eligible or invited testers.',
+            'url' => '/strength/',
+            'type' => 'product',
             'status' => 'inactive'
         ),
         array(
             'title' => 'Explore the Human Ontology',
             'label' => 'Discover Human Ontology',
             'supporting' => 'Explore the structured exercise knowledge system.',
-            'url' => '/ontology',
+            'url' => '/ontology/',
             'type' => 'learn',
             'status' => 'active'
         ),
@@ -380,7 +361,7 @@ function human_migration_1_0_0() {
             'title' => 'Read the Training Guides',
             'label' => 'Read Journal',
             'supporting' => 'Deep dives into progression and programming.',
-            'url' => '/journal',
+            'url' => '/journal/',
             'type' => 'content',
             'status' => 'active'
         )
@@ -412,48 +393,37 @@ function human_migration_1_0_0() {
         }
     }
 
-    // Seed Campaign
-    $existing_camp = get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign');
-    if (!$existing_camp) {
-        $post_id = wp_insert_post(array(
-            'post_title' => 'Strength V1 Launch',
-            'post_status' => 'publish',
-            'post_type' => 'human_campaign'
-        ));
-        if ($post_id && !is_wp_error($post_id)) {
-            update_post_meta($post_id, '_human_camp_objective', 'Initial product launch and awareness');
-            update_post_meta($post_id, '_human_camp_status', 'planned'); // Deliberately inactive
-            update_post_meta($post_id, '_human_camp_utm_id', 'strength_v1_launch');
-            update_post_meta($post_id, '_human_camp_priority', 'high');
-            
-            $strength_app = get_page_by_path('strength', OBJECT, 'human_app');
-            if ($strength_app) {
-                update_post_meta($post_id, '_human_camp_associated_app', $strength_app->ID);
-            }
-            
-            $primary_cta = get_page_by_title('Get Human Strength on Google Play', OBJECT, 'human_cta');
-            if ($primary_cta) {
-                update_post_meta($post_id, '_human_camp_primary_cta', $primary_cta->ID);
-            }
-        }
-    }
+    // Sample Campaigns are introduced by migration 1.5.0 so fresh installs
+    // and upgraded installs share the same safety contract.
 
     $articles = human_get_cornerstone_articles();
     foreach ($articles as $art) {
         $existing = get_page_by_path($art['slug'], OBJECT, 'post');
         if (!$existing) {
+            $post_status = ($art['status'] ?? 'draft') === 'publish' ? 'publish' : 'draft';
             $post_id = wp_insert_post(array(
                 'post_title'   => $art['title'],
                 'post_name'    => $art['slug'],
                 'post_content' => $art['content'],
                 'post_excerpt' => $art['excerpt'],
-                'post_status'  => 'publish',
-                'post_type'    => 'post',
-                'post_date'    => $art['date'] . ' 10:00:00'
+                'post_status'  => $post_status,
+                'post_type'    => 'post'
             ));
             if ($post_id && !is_wp_error($post_id)) {
+                update_post_meta($post_id, '_human_seed_key', $art['seed_key']);
+                update_post_meta($post_id, '_human_is_sample', $post_status === 'draft' ? '1' : '0');
+                update_post_meta($post_id, '_human_automation_eligible', '0');
+                update_post_meta($post_id, '_human_content_approval_state', $post_status === 'publish' ? 'approved_reference' : 'draft');
                 update_post_meta($post_id, '_human_seo_title', $art['seo_title']);
                 update_post_meta($post_id, '_human_seo_description', $art['seo_desc']);
+                update_post_meta($post_id, '_human_post_primary_topic', $art['primary_topic']);
+                update_post_meta($post_id, '_human_post_search_intent', $art['search_intent']);
+                update_post_meta($post_id, '_human_social_title', $art['social_title']);
+                update_post_meta($post_id, '_human_social_description', $art['social_desc']);
+                update_post_meta($post_id, '_human_social_image', get_template_directory_uri() . '/assets/human-og-share.png');
+                update_post_meta($post_id, '_human_promo_copy', $art['promo_copy']);
+                update_post_meta($post_id, '_human_post_content_type', $art['content_type']);
+                update_post_meta($post_id, '_human_post_evergreen', $art['evergreen']);
             }
         }
     }
@@ -479,55 +449,23 @@ function human_migration_1_1_0() {
         }
     }
 
-    // Upgrade the ontology article with comprehensive marketing metadata
+    // Reconcile the historical ontology article only if it exists. The content
+    // itself is retired by migration 1.5.0 when it still matches the old seed.
     $post = get_page_by_path('building-the-human-ontology-towards-a-structured-exercise-knowledge-system', OBJECT, 'post');
     if ($post) {
-        // SEO
         update_post_meta($post->ID, '_human_seo_title', 'Building the Human Ontology: Structured Exercise Knowledge');
-        update_post_meta($post->ID, '_human_seo_description', 'Discover how Human Ontology is building a standardized knowledge graph mapping the physics of human movement for AI-powered strength training apps.');
+        update_post_meta($post->ID, '_human_seo_description', 'An overview of the ongoing Human Ontology programme and its structured approach to exercise identity, movement, anatomy, equipment and relationships.');
         update_post_meta($post->ID, '_human_post_search_intent', 'informational');
         update_post_meta($post->ID, '_human_post_primary_topic', 'human ontology');
-        
-        // Social
-        update_post_meta($post->ID, '_human_social_title', 'The Future of AI Workout Programming');
-        update_post_meta($post->ID, '_human_social_description', 'Building a structured exercise knowledge graph to power intelligent periodization engines.');
-        update_post_meta($post->ID, '_human_social_image', 'https://humanv1.com/assets/human-ontology-diagram.jpg');
-        update_post_meta($post->ID, '_human_promo_copy', 'Standardising the data structures of human movement. Read how the Human Ontology powers AI-driven workout progression. #StrengthTraining #AI');
-        update_post_meta($post->ID, '_human_promo_variant_edu', 'Did you know most workout apps lack a standardized taxonomy? We are fixing that with the Human Ontology.');
-        
-        // Product & CTA
-        $ontology_cta = get_page_by_title('Explore Human Ontology', OBJECT, 'human_cta');
-        if (!$ontology_cta) {
-            $cta_id = wp_insert_post(array(
-                'post_title' => 'Explore Human Ontology',
-                'post_type' => 'human_cta',
-                'post_status' => 'publish'
-            ));
-            if ($cta_id && !is_wp_error($cta_id)) {
-                update_post_meta($cta_id, '_human_cta_label', 'Discover Human Ontology');
-                update_post_meta($cta_id, '_human_cta_supporting_text', 'Learn how we are building a structured exercise knowledge graph.');
-                update_post_meta($cta_id, '_human_cta_destination_url', '/ontology');
-                update_post_meta($cta_id, '_human_cta_type', 'content');
-                update_post_meta($cta_id, '_human_cta_status', 'active');
-                $ontology_cta = get_post($cta_id);
-            }
-        }
-        
-        if ($ontology_cta) {
-            update_post_meta($post->ID, '_human_post_primary_cta', $ontology_cta->ID);
-        }
-        
-        $coach_app = get_page_by_path('coach', OBJECT, 'human_app');
-        if ($coach_app) {
-            update_post_meta($post->ID, '_human_post_primary_product', $coach_app->ID);
-        }
-
-        // Lifecycle
-        update_post_meta($post->ID, '_human_post_content_type', 'evergreen');
-        update_post_meta($post->ID, '_human_post_marketing_status', 'marketing_ready');
-        update_post_meta($post->ID, '_human_post_review_date', '2027-01-01');
+        update_post_meta($post->ID, '_human_social_title', 'Building the Human Ontology');
+        update_post_meta($post->ID, '_human_social_description', 'An ongoing Human V1 programme for structuring exercise identity, movement, anatomy, equipment and relationships.');
+        update_post_meta($post->ID, '_human_social_image', get_template_directory_uri() . '/assets/human-og-share.png');
+        update_post_meta($post->ID, '_human_promo_copy', 'Human Ontology is an ongoing structured exercise knowledge programme within Human V1.');
+        update_post_meta($post->ID, '_human_post_content_type', 'reference');
+        update_post_meta($post->ID, '_human_post_marketing_status', 'needs_review');
         update_post_meta($post->ID, '_human_post_evergreen', '1');
     }
+
 }
 
 function human_migration_1_2_0() {
@@ -561,18 +499,18 @@ function human_migration_1_2_0() {
         array(
             'title' => 'Explore Human Strength',
             'label' => 'Explore Human Strength',
-            'supporting' => 'Learn how our offline-first strength log works.',
-            'url' => '/strength',
+            'supporting' => 'Learn about Human Strength and its current Google Play Internal Testing status.',
+            'url' => '/strength/',
             'type' => 'product',
             'status' => 'active',
             'associated_app_slug' => 'strength'
         ),
         array(
-            'title' => 'Get Human Strength on Google Play',
-            'label' => 'Download App',
-            'supporting' => 'Now available for early access on Android.',
-            'url' => 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza',
-            'type' => 'download',
+            'title' => 'Human Strength Internal Testing',
+            'label' => 'Internal Testing',
+            'supporting' => 'Access is limited to eligible or invited testers.',
+            'url' => '/strength/',
+            'type' => 'product',
             'status' => 'inactive',
             'associated_app_slug' => 'strength'
         ),
@@ -580,7 +518,7 @@ function human_migration_1_2_0() {
             'title' => 'Explore Human Ontology',
             'label' => 'Discover Human Ontology',
             'supporting' => 'Explore the structured exercise knowledge system.',
-            'url' => '/ontology',
+            'url' => '/ontology/',
             'type' => 'learn',
             'status' => 'active'
         ),
@@ -588,7 +526,7 @@ function human_migration_1_2_0() {
             'title' => 'Read the Training Guides',
             'label' => 'Read Journal',
             'supporting' => 'Deep dives into progression and programming.',
-            'url' => '/journal',
+            'url' => '/journal/',
             'type' => 'content',
             'status' => 'active'
         )
@@ -617,31 +555,7 @@ function human_migration_1_2_0() {
         }
     }
 
-    // 3. Reconcile Campaign
-    $existing_camp = get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign');
-    if (!$existing_camp) {
-        $post_id = wp_insert_post(array(
-            'post_title' => 'Strength V1 Launch',
-            'post_status' => 'publish',
-            'post_type' => 'human_campaign'
-        ));
-        if ($post_id && !is_wp_error($post_id)) {
-            update_post_meta($post_id, '_human_camp_objective', 'Initial product launch and awareness');
-            update_post_meta($post_id, '_human_camp_status', 'planned'); // Deliberately inactive
-            update_post_meta($post_id, '_human_camp_utm_id', 'strength_v1_launch');
-            update_post_meta($post_id, '_human_camp_priority', 'high');
-            
-            $strength_app = get_page_by_path('strength', OBJECT, 'human_app');
-            if ($strength_app) {
-                update_post_meta($post_id, '_human_camp_associated_app', $strength_app->ID);
-            }
-            
-            $primary_cta = get_page_by_title('Get Human Strength on Google Play', OBJECT, 'human_cta');
-            if ($primary_cta) {
-                update_post_meta($post_id, '_human_camp_primary_cta', $primary_cta->ID);
-            }
-        }
-    }
+    // 3. Sample Campaigns are reconciled by migration 1.5.0.
 
     // Reconcile Taxonomy
     $required_cats = array('Programming', 'Human Ontology', 'Product News');
@@ -684,23 +598,23 @@ function human_migration_1_2_0() {
     // Primary Header Menu
     human_create_menu_if_missing('Primary Header Menu', 'primary-menu', array(
         array('title' => 'Home', 'url' => '/'),
-        array('title' => 'Apps', 'url' => '/apps'),
-        array('title' => 'Human Ontology', 'url' => '/ontology'),
-        array('title' => 'Journal', 'url' => '/journal'),
-        array('title' => 'About', 'url' => '/about'),
-        array('title' => 'Support', 'url' => '/support')
+        array('title' => 'Apps', 'url' => '/apps/'),
+        array('title' => 'Human Ontology', 'url' => '/ontology/'),
+        array('title' => 'Journal', 'url' => '/journal/'),
+        array('title' => 'About', 'url' => '/about/'),
+        array('title' => 'Support', 'url' => '/support/')
     ));
 
     // Footer Navigation Menu
     human_create_menu_if_missing('Footer Navigation Menu', 'footer-menu', array(
-        array('title' => 'Human Ontology', 'url' => '/ontology'),
+        array('title' => 'Human Ontology', 'url' => '/ontology/'),
         array('title' => 'Human Journal', 'url' => '/journal'),
         array('title' => 'About Platform', 'url' => '/about'),
-        array('title' => 'Contact & Media', 'url' => '/contact'),
-        array('title' => 'Customer Support', 'url' => '/support'),
-        array('title' => 'Privacy Policy', 'url' => '/privacy'),
-        array('title' => 'Terms of Service', 'url' => '/terms'),
-        array('title' => 'Data Deletion', 'url' => '/data-deletion')
+        array('title' => 'Contact & Media', 'url' => '/contact/'),
+        array('title' => 'Customer Support', 'url' => '/support/'),
+        array('title' => 'Privacy Policy', 'url' => '/privacy-policy/'),
+        array('title' => 'Terms of Service', 'url' => '/terms/'),
+        array('title' => 'Data Deletion', 'url' => '/data-deletion/')
     ));
 
     // Apps Navigation Menu
@@ -717,7 +631,7 @@ function human_get_marketing_foundation_health() {
         'schema_version' => get_option('human_marketing_schema_version', '0.0.0'),
         'apps' => array('expected' => 8, 'found' => 0, 'missing' => 0),
         'ctas' => array('expected' => 4, 'found' => 0, 'missing' => 0),
-        'campaigns' => array('expected' => 1, 'found' => 0, 'missing' => 0),
+        'campaigns' => array('expected' => 4, 'found' => 0, 'missing' => 0),
         'taxonomy' => array('missing' => array()),
         'navigation' => array(
             'primary-menu' => 'unassigned',
@@ -741,7 +655,7 @@ function human_get_marketing_foundation_health() {
     // CTAs
     $ctas = array(
         'Explore Human Strength',
-        'Get Human Strength on Google Play',
+        'Human Strength Internal Testing',
         'Explore Human Ontology',
         'Read the Training Guides'
     );
@@ -754,11 +668,23 @@ function human_get_marketing_foundation_health() {
     }
     if ($health['ctas']['missing'] > 0) $health['status'] = 'NEEDS ATTENTION';
 
-    // Campaigns
-    if (get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign')) {
-        $health['campaigns']['found'] = 1;
-    } else {
-        $health['campaigns']['missing'] = 1;
+    // Sample/reference Campaigns
+    foreach (human_get_sample_campaign_definitions() as $campaign_definition) {
+        $matches = get_posts(array(
+            'post_type' => 'human_campaign',
+            'post_status' => array('draft', 'publish'),
+            'numberposts' => 1,
+            'meta_key' => '_human_camp_seed_key',
+            'meta_value' => $campaign_definition['seed_key'],
+            'fields' => 'ids',
+        ));
+        if ($matches) {
+            $health['campaigns']['found']++;
+        } else {
+            $health['campaigns']['missing']++;
+        }
+    }
+    if ($health['campaigns']['missing'] > 0) {
         $health['status'] = 'NEEDS ATTENTION';
     }
     
@@ -1378,5 +1304,613 @@ function human_migration_1_4_0() {
         return true;
     } finally {
         human_release_app_migration_lock($owner_token);
+    }
+}
+
+/**
+ * Return sample Campaign definitions used as safe reference data.
+ *
+ * Sample campaigns are intentionally draft, unapproved and never automation
+ * eligible. They exist to demonstrate the marketing workflow without becoming
+ * publishable payloads.
+ */
+function human_get_sample_campaign_definitions() {
+    return array(
+        array(
+            'seed_key' => 'campaign_human_v1_brand_intro_v1',
+            'title' => 'Human V1 Brand Introduction',
+            'objective' => 'Introduce Human V1 and explain Human Version 1.0 without overstating future products.',
+            'associated_app_slug' => '',
+            'target_url' => '/',
+            'utm_id' => 'human_v1_brand_intro',
+            'utm_source' => 'facebook',
+            'utm_medium' => 'social',
+            'utm_campaign' => 'human_v1_brand_intro',
+            'priority' => 'normal',
+            'facebook_copy' => 'Human V1 means Human Version 1.0. Human Strength is the first product, while the wider Human V1 roadmap remains a set of future products and ideas.',
+            'instagram_copy' => 'Human V1 = Human Version 1.0. Start with Human Strength, stay truthful about what exists today, and build the wider platform from there.',
+        ),
+        array(
+            'seed_key' => 'campaign_strength_internal_testing_v1',
+            'title' => 'Human Strength Internal Testing',
+            'objective' => 'Explain that Human Strength is currently in Google Play Internal Testing for eligible or invited testers.',
+            'associated_app_slug' => 'strength',
+            'target_url' => '/strength/',
+            'utm_id' => 'human_strength_internal_testing',
+            'utm_source' => 'facebook',
+            'utm_medium' => 'social',
+            'utm_campaign' => 'human_strength_internal_testing',
+            'priority' => 'high',
+            'facebook_copy' => 'Human Strength is currently in Google Play Internal Testing. Tester access is real, but general public Play Store availability is not being claimed yet.',
+            'instagram_copy' => 'Human Strength is in Internal Testing on Google Play. Current status: eligible or invited testers, not a general public release.',
+        ),
+        array(
+            'seed_key' => 'campaign_strength_access_explainer_v1',
+            'title' => 'How Human Strength Access Works',
+            'objective' => 'Explain Google Sign-In, Human V1 introductory account access and separate Google Play paid membership.',
+            'associated_app_slug' => 'strength',
+            'target_url' => '/how-human-strength-access-works/',
+            'utm_id' => 'human_strength_access',
+            'utm_source' => 'facebook',
+            'utm_medium' => 'social',
+            'utm_campaign' => 'human_strength_access',
+            'priority' => 'normal',
+            'facebook_copy' => 'Human Strength access has separate parts: Google Sign-In, Human V1 introductory account access, and paid Google Play membership. The account access period is not a Google Play free trial.',
+            'instagram_copy' => 'Google Sign-In, Human V1 account access and paid Google Play membership are separate parts of the Human Strength access flow.',
+        ),
+        array(
+            'seed_key' => 'campaign_why_strength_first_v1',
+            'title' => 'Why Human V1 Begins with Strength',
+            'objective' => 'Distribute the Human Journal article explaining why Human Strength is the first Human V1 product.',
+            'associated_app_slug' => 'strength',
+            'target_url' => '/why-human-v1-begins-with-strength/',
+            'utm_id' => 'why_strength_first',
+            'utm_source' => 'facebook',
+            'utm_medium' => 'social',
+            'utm_campaign' => 'why_strength_first',
+            'priority' => 'normal',
+            'facebook_copy' => 'Why begin Human V1 with strength? Because one focused product gives the platform something real to build from. Human Strength is currently in Google Play Internal Testing.',
+            'instagram_copy' => 'One focused first product. Human Strength is where Human V1 begins, currently in Google Play Internal Testing.',
+        ),
+    );
+}
+
+/**
+ * Seed or reconcile one reference Journal post without overwriting editor work.
+ *
+ * @return int|WP_Error
+ */
+function human_upsert_reference_journal_post($definition, &$conflicts) {
+    $existing = get_page_by_path($definition['slug'], OBJECT, 'post');
+    $post_status = $definition['status'] === 'publish' ? 'publish' : 'draft';
+    $seed_hash = hash('sha256', wp_json_encode(array(
+        $definition['title'],
+        $definition['excerpt'],
+        $definition['content'],
+        $definition['seo_title'],
+        $definition['seo_desc'],
+        $definition['social_title'],
+        $definition['social_desc'],
+        $definition['promo_copy'],
+    )));
+
+    if (!$existing) {
+        $post_id = wp_insert_post(array(
+            'post_title' => $definition['title'],
+            'post_name' => $definition['slug'],
+            'post_content' => $definition['content'],
+            'post_excerpt' => $definition['excerpt'],
+            'post_status' => $post_status,
+            'post_type' => 'post',
+        ), true);
+        if (is_wp_error($post_id) || !$post_id) {
+            return is_wp_error($post_id)
+                ? $post_id
+                : new WP_Error('human_reference_post_insert_failed', 'Could not create Human Journal reference content.');
+        }
+    } else {
+        $post_id = (int) $existing->ID;
+        $stored_seed_key = (string) get_post_meta($post_id, '_human_seed_key', true);
+        $stored_seed_hash = (string) get_post_meta($post_id, '_human_seed_hash', true);
+
+        if ($stored_seed_key !== '' && $stored_seed_key !== $definition['seed_key']) {
+            $conflicts[] = array(
+                'type' => 'journal',
+                'slug' => $definition['slug'],
+                'reason' => 'Existing post belongs to a different seed key.',
+                'post_id' => $post_id,
+            );
+            return $post_id;
+        }
+
+        if ($stored_seed_hash !== '') {
+            $current_hash = hash('sha256', wp_json_encode(array(
+                $existing->post_title,
+                $existing->post_excerpt,
+                $existing->post_content,
+                get_post_meta($post_id, '_human_seo_title', true),
+                get_post_meta($post_id, '_human_seo_description', true),
+                get_post_meta($post_id, '_human_social_title', true),
+                get_post_meta($post_id, '_human_social_description', true),
+                get_post_meta($post_id, '_human_promo_copy', true),
+            )));
+            if (!hash_equals($stored_seed_hash, $current_hash)) {
+                if ($post_status === 'draft') {
+                    wp_update_post(array('ID' => $post_id, 'post_status' => 'draft'));
+                    update_post_meta($post_id, '_human_is_sample', '1');
+                    update_post_meta($post_id, '_human_content_approval_state', 'draft');
+                }
+                update_post_meta($post_id, '_human_automation_eligible', '0');
+                $conflicts[] = array(
+                    'type' => 'journal',
+                    'slug' => $definition['slug'],
+                    'reason' => 'Editor-managed content differs from the last seed fingerprint and was preserved.',
+                    'post_id' => $post_id,
+                );
+                return $post_id;
+            }
+        } elseif ($existing->post_content !== $definition['content'] || $existing->post_title !== $definition['title']) {
+            if ($post_status === 'draft') {
+                wp_update_post(array('ID' => $post_id, 'post_status' => 'draft'));
+                update_post_meta($post_id, '_human_is_sample', '1');
+                update_post_meta($post_id, '_human_content_approval_state', 'draft');
+                update_post_meta($post_id, '_human_automation_eligible', '0');
+            }
+            $conflicts[] = array(
+                'type' => 'journal',
+                'slug' => $definition['slug'],
+                'reason' => 'Pre-existing content has no seed fingerprint and was preserved.',
+                'post_id' => $post_id,
+            );
+            return $post_id;
+        }
+
+        $updated = wp_update_post(wp_slash(array(
+            'ID' => $post_id,
+            'post_title' => $definition['title'],
+            'post_name' => $definition['slug'],
+            'post_content' => $definition['content'],
+            'post_excerpt' => $definition['excerpt'],
+            'post_status' => $post_status,
+        )), true);
+        if (is_wp_error($updated)) {
+            return $updated;
+        }
+    }
+
+    update_post_meta($post_id, '_human_seed_key', $definition['seed_key']);
+    update_post_meta($post_id, '_human_is_sample', $post_status === 'draft' ? '1' : '0');
+    update_post_meta($post_id, '_human_automation_eligible', '0');
+    update_post_meta($post_id, '_human_content_approval_state', $post_status === 'publish' ? 'approved_reference' : 'draft');
+    update_post_meta($post_id, '_human_seo_title', $definition['seo_title']);
+    update_post_meta($post_id, '_human_seo_description', $definition['seo_desc']);
+    update_post_meta($post_id, '_human_post_primary_topic', $definition['primary_topic']);
+    update_post_meta($post_id, '_human_post_search_intent', $definition['search_intent']);
+    update_post_meta($post_id, '_human_social_title', $definition['social_title']);
+    update_post_meta($post_id, '_human_social_description', $definition['social_desc']);
+    update_post_meta($post_id, '_human_social_image', get_template_directory_uri() . '/assets/human-og-share.png');
+    update_post_meta($post_id, '_human_promo_copy', $definition['promo_copy']);
+    update_post_meta($post_id, '_human_post_content_type', $definition['content_type']);
+    update_post_meta($post_id, '_human_post_evergreen', $definition['evergreen']);
+    update_post_meta($post_id, '_human_post_marketing_status', $post_status === 'publish' ? 'reference' : 'sample');
+
+    if (!empty($definition['primary_app_slug'])) {
+        $primary_app = get_page_by_path($definition['primary_app_slug'], OBJECT, 'human_app');
+        if ($primary_app) {
+            update_post_meta($post_id, '_human_post_primary_product', $primary_app->ID);
+        }
+    } else {
+        delete_post_meta($post_id, '_human_post_primary_product');
+    }
+
+    if (!empty($definition['primary_cta_title'])) {
+        $primary_cta = get_page_by_title($definition['primary_cta_title'], OBJECT, 'human_cta');
+        if ($primary_cta) {
+            update_post_meta($post_id, '_human_post_primary_cta', $primary_cta->ID);
+        }
+    } else {
+        delete_post_meta($post_id, '_human_post_primary_cta');
+    }
+
+    $category = get_term_by('name', $definition['category'], 'category');
+    if (!$category) {
+        $created = wp_insert_term($definition['category'], 'category');
+        if (!is_wp_error($created)) {
+            $category_id = (int) $created['term_id'];
+        } else {
+            $category_id = 0;
+        }
+    } else {
+        $category_id = (int) $category->term_id;
+    }
+    if ($category_id) {
+        wp_set_post_categories($post_id, array($category_id), false);
+    }
+
+    $fresh = get_post($post_id);
+    $final_hash = hash('sha256', wp_json_encode(array(
+        $fresh->post_title,
+        $fresh->post_excerpt,
+        $fresh->post_content,
+        get_post_meta($post_id, '_human_seo_title', true),
+        get_post_meta($post_id, '_human_seo_description', true),
+        get_post_meta($post_id, '_human_social_title', true),
+        get_post_meta($post_id, '_human_social_description', true),
+        get_post_meta($post_id, '_human_promo_copy', true),
+    )));
+    update_post_meta($post_id, '_human_seed_hash', $final_hash);
+
+    return $post_id;
+}
+
+/**
+ * Seed or reconcile one sample Campaign.
+ *
+ * @return int|WP_Error
+ */
+function human_upsert_sample_campaign($definition, &$conflicts) {
+    $matches = get_posts(array(
+        'post_type' => 'human_campaign',
+        'post_status' => 'any',
+        'numberposts' => -1,
+        'meta_key' => '_human_camp_seed_key',
+        'meta_value' => $definition['seed_key'],
+        'fields' => 'ids',
+    ));
+
+    if (count($matches) > 1) {
+        return new WP_Error(
+            'human_sample_campaign_duplicate',
+            sprintf('Multiple sample Campaigns use seed key %s.', $definition['seed_key'])
+        );
+    }
+
+    if ($matches) {
+        $post_id = (int) $matches[0];
+        $post = get_post($post_id);
+        $stored_hash = (string) get_post_meta($post_id, '_human_camp_seed_hash', true);
+        if ($stored_hash !== '') {
+            $current_hash = hash('sha256', wp_json_encode(array(
+                $post->post_title,
+                $post->post_content,
+                get_post_meta($post_id, '_human_camp_objective', true),
+                get_post_meta($post_id, '_human_camp_target_url', true),
+                get_post_meta($post_id, '_human_camp_utm_id', true),
+                get_post_meta($post_id, '_human_camp_facebook_copy', true),
+                get_post_meta($post_id, '_human_camp_instagram_copy', true),
+            )));
+            if (!hash_equals($stored_hash, $current_hash)) {
+                wp_update_post(array('ID' => $post_id, 'post_status' => 'draft'));
+                update_post_meta($post_id, '_human_is_sample', '1');
+                update_post_meta($post_id, '_human_camp_approval_state', 'draft');
+                update_post_meta($post_id, '_human_camp_automation_eligible', '0');
+                $conflicts[] = array(
+                    'type' => 'campaign',
+                    'seed_key' => $definition['seed_key'],
+                    'reason' => 'Editor-managed Campaign differs from the last sample seed fingerprint and was preserved.',
+                    'post_id' => $post_id,
+                );
+                return $post_id;
+            }
+        }
+    } else {
+        $post_id = wp_insert_post(array(
+            'post_title' => $definition['title'],
+            'post_content' => $definition['objective'],
+            'post_status' => 'draft',
+            'post_type' => 'human_campaign',
+        ), true);
+        if (is_wp_error($post_id) || !$post_id) {
+            return is_wp_error($post_id)
+                ? $post_id
+                : new WP_Error('human_sample_campaign_insert_failed', 'Could not create Human sample Campaign.');
+        }
+    }
+
+    $updated = wp_update_post(array(
+        'ID' => $post_id,
+        'post_title' => $definition['title'],
+        'post_content' => $definition['objective'],
+        'post_status' => 'draft',
+    ), true);
+    if (is_wp_error($updated)) {
+        return $updated;
+    }
+
+    update_post_meta($post_id, '_human_camp_seed_key', $definition['seed_key']);
+    update_post_meta($post_id, '_human_is_sample', '1');
+    update_post_meta($post_id, '_human_camp_approval_state', 'draft');
+    update_post_meta($post_id, '_human_camp_automation_eligible', '0');
+    update_post_meta($post_id, '_human_camp_status', 'draft');
+    update_post_meta($post_id, '_human_camp_objective', $definition['objective']);
+    update_post_meta($post_id, '_human_camp_target_url', $definition['target_url']);
+    update_post_meta($post_id, '_human_camp_utm_id', $definition['utm_id']);
+    update_post_meta($post_id, '_human_camp_utm_source', $definition['utm_source']);
+    update_post_meta($post_id, '_human_camp_utm_medium', $definition['utm_medium']);
+    update_post_meta($post_id, '_human_camp_utm_campaign', $definition['utm_campaign']);
+    update_post_meta($post_id, '_human_camp_priority', $definition['priority']);
+    update_post_meta($post_id, '_human_camp_facebook_copy', $definition['facebook_copy']);
+    update_post_meta($post_id, '_human_camp_instagram_copy', $definition['instagram_copy']);
+
+    if ($definition['associated_app_slug'] !== '') {
+        $app = get_page_by_path($definition['associated_app_slug'], OBJECT, 'human_app');
+        if ($app) {
+            update_post_meta($post_id, '_human_camp_associated_app', $app->ID);
+        }
+    }
+
+    $fresh = get_post($post_id);
+    $seed_hash = hash('sha256', wp_json_encode(array(
+        $fresh->post_title,
+        $fresh->post_content,
+        get_post_meta($post_id, '_human_camp_objective', true),
+        get_post_meta($post_id, '_human_camp_target_url', true),
+        get_post_meta($post_id, '_human_camp_utm_id', true),
+        get_post_meta($post_id, '_human_camp_facebook_copy', true),
+        get_post_meta($post_id, '_human_camp_instagram_copy', true),
+    )));
+    update_post_meta($post_id, '_human_camp_seed_hash', $seed_hash);
+
+    return $post_id;
+}
+
+/**
+ * Acquire the content reconciliation lock.
+ *
+ * @return string|WP_Error Owner token on success.
+ */
+function human_acquire_content_migration_lock() {
+    global $wpdb;
+
+    $option_name = 'human_content_migration_1_5_0_lock';
+    $now = time();
+    $token = wp_generate_uuid4();
+    $payload = array(
+        'owner' => $token,
+        'acquired_at' => $now,
+        'expires_at' => $now + 900,
+    );
+
+    if (add_option($option_name, $payload, '', 'no')) {
+        return $token;
+    }
+
+    $existing = get_option($option_name, null);
+    if (!is_array($existing) || empty($existing['expires_at']) || (int) $existing['expires_at'] > $now) {
+        return new WP_Error('human_content_migration_locked', 'Content migration 1.5.0 is already running.');
+    }
+
+    $replaced = $wpdb->query($wpdb->prepare(
+        "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s",
+        maybe_serialize($payload),
+        $option_name,
+        maybe_serialize($existing)
+    ));
+    wp_cache_delete($option_name, 'options');
+
+    if ($replaced !== 1) {
+        return new WP_Error('human_content_migration_lock_race', 'Another request acquired the content migration lock.');
+    }
+
+    return $token;
+}
+
+/**
+ * Release the content reconciliation lock only when this process still owns it.
+ */
+function human_release_content_migration_lock($owner_token) {
+    global $wpdb;
+
+    $option_name = 'human_content_migration_1_5_0_lock';
+    $existing = get_option($option_name, null);
+    if (is_array($existing)
+        && isset($existing['owner'])
+        && hash_equals((string) $existing['owner'], (string) $owner_token)
+    ) {
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s",
+            $option_name,
+            maybe_serialize($existing)
+        ));
+        wp_cache_delete($option_name, 'options');
+    }
+}
+
+/**
+ * Reconcile stale launch-era Journal and Campaign sample data.
+ *
+ * No editor-modified post is deleted or overwritten. Exact historical seed
+ * fingerprints are moved to draft and labelled as retired samples.
+ */
+function human_migration_1_5_0() {
+    $owner_token = human_acquire_content_migration_lock();
+    if (is_wp_error($owner_token)) {
+        return $owner_token;
+    }
+
+    $conflicts = array();
+
+    try {
+        // Replace the untouched stock WordPress Hello World post with the
+        // canonical published Human V1 introduction article.
+        $hello = get_page_by_path('hello-world', OBJECT, 'post');
+        if ($hello) {
+            $stock_content = 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!';
+            $intro = human_get_cornerstone_articles()[0];
+            $intro_existing = get_page_by_path($intro['slug'], OBJECT, 'post');
+            if ($hello->post_title === 'Hello world!'
+                && trim($hello->post_content) === $stock_content
+                && trim($hello->post_excerpt) === ''
+                && (!$intro_existing || (int) $intro_existing->ID === (int) $hello->ID)
+            ) {
+                $updated = wp_update_post(wp_slash(array(
+                    'ID' => $hello->ID,
+                    'post_title' => $intro['title'],
+                    'post_name' => $intro['slug'],
+                    'post_content' => $intro['content'],
+                    'post_excerpt' => $intro['excerpt'],
+                    'post_status' => 'publish',
+                )), true);
+                if (is_wp_error($updated)) {
+                    return $updated;
+                }
+            } elseif ($hello->post_title === 'Hello world!'
+                && trim($hello->post_content) === $stock_content
+                && trim($hello->post_excerpt) === ''
+                && $intro_existing
+            ) {
+                wp_update_post(array('ID' => $hello->ID, 'post_status' => 'draft'));
+                update_post_meta($hello->ID, '_human_legacy_seed_retired', '1');
+            } else {
+                $conflicts[] = array(
+                    'type' => 'journal',
+                    'slug' => 'hello-world',
+                    'reason' => 'The default WordPress post has been edited and was preserved.',
+                    'post_id' => (int) $hello->ID,
+                );
+            }
+        }
+
+        // Retire untouched historical 1.0.0 seed articles. Edited articles stay
+        // exactly as they are and are surfaced in the conflict report.
+        foreach (human_get_legacy_cornerstone_fingerprints() as $slug => $legacy_hashes) {
+            $post = get_page_by_path($slug, OBJECT, 'post');
+            if (!$post) {
+                continue;
+            }
+            $current_content_hash = hash('sha256', $post->post_content);
+            $current_title_hash = hash('sha256', $post->post_title);
+            if (hash_equals($legacy_hashes['content'], $current_content_hash)
+                && hash_equals($legacy_hashes['title'], $current_title_hash)
+            ) {
+                $updated = wp_update_post(array(
+                    'ID' => $post->ID,
+                    'post_status' => 'draft',
+                ), true);
+                if (is_wp_error($updated)) {
+                    return $updated;
+                }
+                update_post_meta($post->ID, '_human_is_sample', '1');
+                update_post_meta($post->ID, '_human_automation_eligible', '0');
+                update_post_meta($post->ID, '_human_content_approval_state', 'retired_legacy_seed');
+                update_post_meta($post->ID, '_human_legacy_seed_retired', '1');
+            } else {
+                $conflicts[] = array(
+                    'type' => 'journal',
+                    'slug' => $slug,
+                    'reason' => 'Historical seed article was edited and was preserved.',
+                    'post_id' => (int) $post->ID,
+                );
+            }
+        }
+
+        // Seed/reconcile the current reference Journal set.
+        foreach (human_get_cornerstone_articles() as $definition) {
+            $result = human_upsert_reference_journal_post($definition, $conflicts);
+            if (is_wp_error($result)) {
+                return $result;
+            }
+        }
+
+        // Retire the original public-download CTA if it is still the untouched
+        // launch-era seed. Internal Testing must not expose a general Play CTA.
+        $legacy_download_cta = get_page_by_title('Get Human Strength on Google Play', OBJECT, 'human_cta');
+        if ($legacy_download_cta) {
+            $legacy_label = (string) get_post_meta($legacy_download_cta->ID, '_human_cta_label', true);
+            $legacy_url = (string) get_post_meta($legacy_download_cta->ID, '_human_cta_destination_url', true);
+            $legacy_supporting = (string) get_post_meta($legacy_download_cta->ID, '_human_cta_supporting_text', true);
+            $is_known_legacy_download = $legacy_url === 'https://play.google.com/store/apps/details?id=com.aistudio.humanstrength.kfqjza'
+                && (
+                    ($legacy_label === 'Download on Google Play'
+                        && $legacy_supporting === 'Start your 30-day introductory trial today.')
+                    || ($legacy_label === 'Download App'
+                        && $legacy_supporting === 'Now available for early access on Android.')
+                );
+            if ($is_known_legacy_download) {
+                update_post_meta($legacy_download_cta->ID, '_human_cta_status', 'inactive');
+                update_post_meta($legacy_download_cta->ID, '_human_cta_label', 'Internal Testing');
+                update_post_meta($legacy_download_cta->ID, '_human_cta_supporting_text', 'Human Strength is currently limited to eligible or invited testers.');
+                update_post_meta($legacy_download_cta->ID, '_human_cta_destination_url', '/strength/');
+                update_post_meta($legacy_download_cta->ID, '_human_legacy_seed_retired', '1');
+            } else {
+                $conflicts[] = array(
+                    'type' => 'cta',
+                    'title' => 'Get Human Strength on Google Play',
+                    'reason' => 'Historical CTA was edited and was preserved.',
+                    'post_id' => (int) $legacy_download_cta->ID,
+                );
+            }
+        }
+
+        // Retire the exact original launch Campaign if it is still untouched.
+        $legacy_campaign = get_page_by_title('Strength V1 Launch', OBJECT, 'human_campaign');
+        if ($legacy_campaign) {
+            $legacy_objective = (string) get_post_meta($legacy_campaign->ID, '_human_camp_objective', true);
+            $legacy_status = (string) get_post_meta($legacy_campaign->ID, '_human_camp_status', true);
+            $legacy_utm = (string) get_post_meta($legacy_campaign->ID, '_human_camp_utm_id', true);
+            if ($legacy_objective === 'Initial product launch and awareness'
+                && $legacy_status === 'planned'
+                && $legacy_utm === 'strength_v1_launch'
+            ) {
+                wp_update_post(array('ID' => $legacy_campaign->ID, 'post_status' => 'draft'));
+                update_post_meta($legacy_campaign->ID, '_human_camp_status', 'archived');
+                update_post_meta($legacy_campaign->ID, '_human_is_sample', '1');
+                update_post_meta($legacy_campaign->ID, '_human_camp_approval_state', 'draft');
+                update_post_meta($legacy_campaign->ID, '_human_camp_automation_eligible', '0');
+                update_post_meta($legacy_campaign->ID, '_human_legacy_seed_retired', '1');
+            } else {
+                $conflicts[] = array(
+                    'type' => 'campaign',
+                    'title' => 'Strength V1 Launch',
+                    'reason' => 'Historical Campaign was edited and was preserved.',
+                    'post_id' => (int) $legacy_campaign->ID,
+                );
+            }
+        }
+
+        foreach (human_get_sample_campaign_definitions() as $definition) {
+            $result = human_upsert_sample_campaign($definition, $conflicts);
+            if (is_wp_error($result)) {
+                return $result;
+            }
+        }
+
+        // Link only seed-managed reference posts to their matching sample
+        // Campaigns. Editor-owned posts are never assigned automatically.
+        foreach (human_get_cornerstone_articles() as $article_definition) {
+            if (empty($article_definition['campaign_seed_key'])) {
+                continue;
+            }
+            $post = get_page_by_path($article_definition['slug'], OBJECT, 'post');
+            if (!$post || get_post_meta($post->ID, '_human_seed_key', true) !== $article_definition['seed_key']) {
+                continue;
+            }
+
+            $campaign_ids = get_posts(array(
+                'post_type' => 'human_campaign',
+                'post_status' => array('draft', 'publish'),
+                'numberposts' => 1,
+                'meta_key' => '_human_camp_seed_key',
+                'meta_value' => $article_definition['campaign_seed_key'],
+                'fields' => 'ids',
+            ));
+            if ($campaign_ids) {
+                update_post_meta($post->ID, '_human_post_primary_campaign', (int) $campaign_ids[0]);
+            }
+        }
+
+        update_option('human_content_migration_1_5_0_conflicts', $conflicts, false);
+        if (get_option('human_content_migration_1_5_0_conflicts', null) !== $conflicts) {
+            return new WP_Error('human_content_conflict_report_write_failed', 'Could not verify the content migration conflict report.');
+        }
+
+        update_option('human_content_seed_version', '1.5.0', false);
+        if (get_option('human_content_seed_version', '') !== '1.5.0') {
+            return new WP_Error('human_content_seed_version_write_failed', 'Could not verify the content seed version.');
+        }
+
+        return true;
+    } finally {
+        human_release_content_migration_lock($owner_token);
     }
 }
