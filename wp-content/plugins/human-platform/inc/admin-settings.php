@@ -1,7 +1,7 @@
 <?php
 /**
  * Admin Settings Page for Human Platform
- * 
+ *
  * Provides a central management UI in WordPress Admin for Brand, Google Play,
  * SEO defaults, Social profiles, and Marketing settings.
  */
@@ -51,27 +51,101 @@ function human_get_default_options() {
         'facebook_url' => 'https://facebook.com/humanv1',
         'instagram_url' => 'https://instagram.com/humanv1',
         'linkedin_url' => 'https://linkedin.com/company/humanv1',
-        'x_twitter_url' => 'https://x.com/humanv1'
+        'x_twitter_url' => 'https://x.com/humanv1',
+        'operator_legal_name' => '',
+        'operator_capacity' => '',
+        'public_contact_email' => '',
+        'privacy_contact_email' => '',
+        'support_contact_email' => '',
+        'privacy_review_state' => 'not_reviewed',
+        'privacy_review_date' => '',
+        'terms_review_state' => 'not_reviewed',
+        'terms_review_date' => '',
+        'data_deletion_review_state' => 'not_reviewed',
+        'data_deletion_review_date' => '',
+        'android_data_flow_review_state' => 'not_reviewed',
+        'android_data_flow_review_date' => '',
+        'deletion_process_review_state' => 'not_reviewed',
+        'deletion_process_review_date' => '',
+        'retention_review_state' => 'not_reviewed',
+        'retention_review_date' => '',
+        'processor_review_state' => 'not_reviewed',
+        'processor_review_date' => ''
     );
 }
 
+function human_validate_review_date($value) {
+    $value = is_scalar($value) ? trim((string) $value) : '';
+    if ($value === '') {
+        return '';
+    }
+
+    $date = DateTime::createFromFormat('!Y-m-d', $value);
+    $errors = DateTime::getLastErrors();
+    $has_errors = is_array($errors) && (!empty($errors['warning_count']) || !empty($errors['error_count']));
+
+    if (!$date || $has_errors || $date->format('Y-m-d') !== $value) {
+        return false;
+    }
+
+    return $value;
+}
+
 function human_sanitize_options($input) {
-    $sanitized = array();
     $defaults = human_get_default_options();
+    $current = get_option('human_options', array());
+    $current = is_array($current) ? $current : array();
+
+    // Preserve existing and unknown keys. A malformed request must not reset
+    // previously stored platform configuration.
+    $sanitized = array_merge($defaults, $current);
+    if (!is_array($input)) {
+        return $sanitized;
+    }
+
+    $allowed_review_states = array('not_reviewed', 'in_review', 'approved');
+    $allowed_capacities = array('individual', 'sole_trader', 'incorporated_entity', 'other');
 
     foreach ($defaults as $key => $default_val) {
-        if (isset($input[$key])) {
-            if (strpos($key, 'email') !== false) {
-                $sanitized[$key] = sanitize_email($input[$key]);
-            } elseif (strpos($key, 'url') !== false) {
-                $sanitized[$key] = esc_url_raw($input[$key]);
-            } else {
-                $sanitized[$key] = sanitize_text_field($input[$key]);
+        if (!array_key_exists($key, $input)) {
+            continue;
+        }
+
+        $value = wp_unslash($input[$key]);
+
+        if ($key === 'operator_capacity') {
+            $candidate = sanitize_key($value);
+            if ($candidate === '' || in_array($candidate, $allowed_capacities, true)) {
+                $sanitized[$key] = $candidate;
             }
+            continue;
+        }
+
+        if (substr($key, -13) === '_review_state') {
+            $candidate = sanitize_key($value);
+            if (in_array($candidate, $allowed_review_states, true)) {
+                $sanitized[$key] = $candidate;
+            }
+            continue;
+        }
+
+        if (substr($key, -12) === '_review_date') {
+            $candidate = human_validate_review_date($value);
+            if ($candidate !== false) {
+                $sanitized[$key] = $candidate;
+            }
+            continue;
+        }
+
+        if (strpos($key, 'email') !== false) {
+            $sanitized[$key] = sanitize_email($value);
+        } elseif (strpos($key, 'url') !== false || $key === 'canonical_domain') {
+            $sanitized[$key] = esc_url_raw($value);
         } else {
-            $sanitized[$key] = $default_val;
+            $sanitized[$key] = sanitize_text_field($value);
         }
     }
+
     return $sanitized;
 }
 
@@ -81,13 +155,13 @@ function human_render_settings_page() {
     }
 
     $options = wp_parse_args(get_option('human_options', array()), human_get_default_options());
-    
+
     // Foundation Diagnostics
     $health = function_exists('human_get_marketing_foundation_health') ? human_get_marketing_foundation_health() : null;
     ?>
     <div class="wrap">
         <h1><span class="dashicons dashicons-performance" style="font-size:30px;width:30px;height:30px;margin-right:10px;"></span> <?php _e('Human Platform Settings', 'human-platform'); ?></h1>
-        
+
         <?php if ($health): ?>
         <div style="background:#fff; border-left:4px solid <?php echo $health['status'] === 'HEALTHY' ? '#46b450' : '#d63638'; ?>; padding:15px; margin-bottom:20px; box-shadow:0 1px 1px rgba(0,0,0,0.04);">
             <h3 style="margin-top:0;">Marketing Foundation <span style="background:<?php echo $health['status'] === 'HEALTHY' ? '#46b450' : '#d63638'; ?>;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:normal;margin-left:10px;"><?php echo esc_html($health['status']); ?></span></h3>
@@ -132,6 +206,96 @@ function human_render_settings_page() {
             <?php
             settings_fields('human_platform_options_group');
             ?>
+            <?php
+            $legal_readiness = array(
+                'Privacy' => function_exists('human_get_privacy_readiness') ? human_get_privacy_readiness() : null,
+                'Terms' => function_exists('human_get_terms_readiness') ? human_get_terms_readiness() : null,
+                'Data Deletion' => function_exists('human_get_data_deletion_readiness') ? human_get_data_deletion_readiness() : null,
+                'Support' => function_exists('human_get_support_readiness') ? human_get_support_readiness() : null,
+            );
+            ?>
+            <h2><?php _e('Legal & Operational Readiness', 'human-platform'); ?></h2>
+            <p><?php _e('Review states are editorial records. Missing facts do not rewrite an approved selection; they keep readiness blocked until every dependency is satisfied.', 'human-platform'); ?></p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:20px;">
+                <?php foreach ($legal_readiness as $label => $readiness): ?>
+                    <?php
+                    $is_ready = is_array($readiness) && !empty($readiness['ready']);
+                    $codes = is_array($readiness) && !empty($readiness['blocker_codes']) ? (array) $readiness['blocker_codes'] : array();
+                    $messages = is_array($readiness) && !empty($readiness['blocker_messages']) ? (array) $readiness['blocker_messages'] : array();
+                    ?>
+                    <div style="background:#fff;border-left:4px solid <?php echo $is_ready ? '#46b450' : '#d63638'; ?>;padding:12px;">
+                        <strong><?php echo esc_html($label); ?>:</strong>
+                        <span><?php echo $is_ready ? esc_html__('Ready', 'human-platform') : esc_html__('Blocked', 'human-platform'); ?></span>
+                        <?php if (!$is_ready && ($codes || $messages)): ?>
+                            <ul style="margin:8px 0 0 18px;">
+                                <?php foreach ($codes as $index => $code): ?>
+                                    <li><code><?php echo esc_html($code); ?></code><?php echo isset($messages[$index]) ? ': ' . esc_html($messages[$index]) : ''; ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <h2><?php _e('Operator & Review Facts', 'human-platform'); ?></h2>
+            <table class="form-table" role="presentation">
+                <tr>
+                    <th scope="row"><label for="operator_legal_name"><?php _e('Operator Legal Name', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[operator_legal_name]" type="text" id="operator_legal_name" value="<?php echo esc_attr($options['operator_legal_name']); ?>" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="operator_capacity"><?php _e('Operator Capacity', 'human-platform'); ?></label></th>
+                    <td>
+                        <select name="human_options[operator_capacity]" id="operator_capacity">
+                            <option value="" <?php selected($options['operator_capacity'], ''); ?>><?php _e('Select', 'human-platform'); ?></option>
+                            <option value="individual" <?php selected($options['operator_capacity'], 'individual'); ?>><?php _e('Individual', 'human-platform'); ?></option>
+                            <option value="sole_trader" <?php selected($options['operator_capacity'], 'sole_trader'); ?>><?php _e('Sole Trader', 'human-platform'); ?></option>
+                            <option value="incorporated_entity" <?php selected($options['operator_capacity'], 'incorporated_entity'); ?>><?php _e('Incorporated Entity', 'human-platform'); ?></option>
+                            <option value="other" <?php selected($options['operator_capacity'], 'other'); ?>><?php _e('Other', 'human-platform'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="public_contact_email"><?php _e('Public Contact Email', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[public_contact_email]" type="email" id="public_contact_email" value="<?php echo esc_attr($options['public_contact_email']); ?>" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="privacy_contact_email"><?php _e('Privacy Contact Email', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[privacy_contact_email]" type="email" id="privacy_contact_email" value="<?php echo esc_attr($options['privacy_contact_email']); ?>" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="support_contact_email"><?php _e('Support Contact Email', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[support_contact_email]" type="email" id="support_contact_email" value="<?php echo esc_attr($options['support_contact_email']); ?>" class="regular-text"></td>
+                </tr>
+                <?php
+                $review_fields = array(
+                    'privacy' => __('Privacy', 'human-platform'),
+                    'terms' => __('Terms', 'human-platform'),
+                    'data_deletion' => __('Data Deletion', 'human-platform'),
+                    'android_data_flow' => __('Android Data Flow', 'human-platform'),
+                    'deletion_process' => __('Deletion Process', 'human-platform'),
+                    'retention' => __('Retention', 'human-platform'),
+                    'processor' => __('Processors / Transfers', 'human-platform'),
+                );
+                foreach ($review_fields as $review_key => $review_label):
+                    $state_key = $review_key . '_review_state';
+                    $date_key = $review_key . '_review_date';
+                ?>
+                <tr>
+                    <th scope="row"><?php echo esc_html($review_label); ?></th>
+                    <td>
+                        <select name="human_options[<?php echo esc_attr($state_key); ?>]">
+                            <option value="not_reviewed" <?php selected($options[$state_key], 'not_reviewed'); ?>><?php _e('Not Reviewed', 'human-platform'); ?></option>
+                            <option value="in_review" <?php selected($options[$state_key], 'in_review'); ?>><?php _e('In Review', 'human-platform'); ?></option>
+                            <option value="approved" <?php selected($options[$state_key], 'approved'); ?>><?php _e('Approved', 'human-platform'); ?></option>
+                        </select>
+                        <input name="human_options[<?php echo esc_attr($date_key); ?>]" type="date" value="<?php echo esc_attr($options[$date_key]); ?>">
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
+            <h2><?php _e('Platform Settings', 'human-platform'); ?></h2>
             <table class="form-table" role="presentation">
                 <tr>
                     <th scope="row"><label for="brand_name"><?php _e('Brand Name', 'human-platform'); ?></label></th>

@@ -142,10 +142,10 @@ get_header();
                     <span class="eyebrow">HUMAN ONTOLOGY PROGRAMME</span>
                     <h2 class="section-title">More Than An Exercise Library</h2>
                     <p style="font-size: 1.05rem; color: #94A3B8; margin-bottom: 1.25rem; line-height: 1.6;">
-                        Human is building a structured exercise knowledge system designed to understand movements, equipment taxonomy, anatomical mechanics, relationships, substitutions, and training context across the entire Human platform.
+                        Human V1 is developing a structured exercise knowledge programme focused on movements, equipment taxonomy, anatomical mechanics, relationships, substitutions, and training context.
                     </p>
                     <p style="font-size: 0.95rem; color: #64748B; margin-bottom: 2rem; line-height: 1.6;">
-                        Our ambition is to build one of the world's most comprehensive structured exercise databases, providing the intelligence foundation for Human Strength, HIIT, Recovery, Coach, and beyond.
+                        The programme is intended to provide a consistent knowledge structure that can support Human V1 products as they are developed.
                     </p>
                     <a href="<?php echo esc_url(home_url('/ontology')); ?>" class="btn btn-secondary">Explore The Human Ontology &rarr;</a>
                 </div>

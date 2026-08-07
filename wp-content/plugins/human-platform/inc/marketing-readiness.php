@@ -18,7 +18,7 @@ function human_get_post_marketing_readiness($post_id) {
         'all_warnings' => array(),
         'all_ready' => array()
     );
-    
+
     $post = get_post($post_id);
     if (!$post) return $readiness;
 
@@ -30,7 +30,7 @@ function human_get_post_marketing_readiness($post_id) {
     } else {
         $readiness['sections']['content']['warnings'][] = 'Post title is missing';
     }
-    
+
     if (!empty(trim(strip_tags($post->post_content)))) {
         $content_score += 5;
         $readiness['sections']['content']['ready'][] = 'Meaningful body content exists';
@@ -58,7 +58,7 @@ function human_get_post_marketing_readiness($post_id) {
     } else {
         $readiness['sections']['content']['warnings'][] = 'Category is not assigned';
     }
-    
+
     $readiness['sections']['content']['score'] = $content_score;
     $readiness['sections']['content']['status'] = $content_score === 20 ? 'READY' : ($content_score > 10 ? 'NEEDS_ATTENTION' : 'INCOMPLETE');
 
@@ -161,7 +161,7 @@ function human_get_post_marketing_readiness($post_id) {
         $readiness['sections']['conversion']['ready'][] = 'Primary CTA configured';
         $cta_status = get_post_meta($primary_cta, '_human_cta_status', true);
         $cta_url = get_post_meta($primary_cta, '_human_cta_destination_url', true);
-        
+
         if ($cta_status === 'active') {
             $conv_score += 5;
             $readiness['sections']['conversion']['ready'][] = 'Primary CTA is active';
@@ -188,7 +188,7 @@ function human_get_post_marketing_readiness($post_id) {
     if (!empty($campaign_id)) {
         $camp_score = 10;
         $readiness['sections']['campaign']['ready'][] = 'Associated with campaign';
-        
+
         $camp_status = get_post_meta($campaign_id, '_human_camp_status', true);
         if ($camp_status === 'completed' || $camp_status === 'cancelled') {
             $readiness['sections']['campaign']['warnings'][] = 'Associated campaign is ' . $camp_status;
@@ -244,3 +244,118 @@ function human_get_post_marketing_readiness($post_id) {
     return $readiness;
 }
 
+/**
+ * Legal and operational readiness helpers.
+ */
+function human_readiness_result($blockers) {
+    $codes = array_keys($blockers);
+    return array(
+        'ready' => empty($codes),
+        'blocker_codes' => $codes,
+        'blocker_messages' => array_values($blockers),
+    );
+}
+
+function human_option_has_valid_email($options, $key) {
+    return !empty($options[$key]) && is_email($options[$key]);
+}
+
+function human_option_has_valid_review_date($options, $key) {
+    if (empty($options[$key]) || !function_exists('human_validate_review_date')) {
+        return false;
+    }
+    return human_validate_review_date($options[$key]) !== false && human_validate_review_date($options[$key]) !== '';
+}
+
+function human_get_privacy_readiness() {
+    $options = wp_parse_args(get_option('human_options', array()), human_get_default_options());
+    $blockers = array();
+
+    if (empty($options['operator_legal_name'])) {
+        $blockers['MISSING_OPERATOR_NAME'] = 'Operator legal name is missing.';
+    }
+    if (empty($options['operator_capacity'])) {
+        $blockers['MISSING_OPERATOR_CAPACITY'] = 'Operator capacity is missing.';
+    }
+    if (!human_option_has_valid_email($options, 'privacy_contact_email')) {
+        $blockers['MISSING_PRIVACY_EMAIL'] = 'A valid privacy contact email is required.';
+    }
+    if (($options['privacy_review_state'] ?? '') !== 'approved') {
+        $blockers['PRIVACY_NOT_APPROVED'] = 'Privacy review state is not approved.';
+    }
+    if (!human_option_has_valid_review_date($options, 'privacy_review_date')) {
+        $blockers['MISSING_PRIVACY_REVIEW_DATE'] = 'A valid privacy review date is required.';
+    }
+    if (($options['android_data_flow_review_state'] ?? '') !== 'approved') {
+        $blockers['ANDROID_FLOW_NOT_APPROVED'] = 'Android data-flow review state is not approved.';
+    }
+    if (($options['retention_review_state'] ?? '') !== 'approved') {
+        $blockers['RETENTION_NOT_APPROVED'] = 'Retention review state is not approved.';
+    }
+    if (($options['processor_review_state'] ?? '') !== 'approved') {
+        $blockers['PROCESSOR_NOT_APPROVED'] = 'Processor / transfer review state is not approved.';
+    }
+
+    return human_readiness_result($blockers);
+}
+
+function human_get_terms_readiness() {
+    $options = wp_parse_args(get_option('human_options', array()), human_get_default_options());
+    $blockers = array();
+
+    if (empty($options['operator_legal_name'])) {
+        $blockers['MISSING_OPERATOR_NAME'] = 'Operator legal name is missing.';
+    }
+    if (empty($options['operator_capacity'])) {
+        $blockers['MISSING_OPERATOR_CAPACITY'] = 'Operator capacity is missing.';
+    }
+    if (!human_option_has_valid_email($options, 'public_contact_email')) {
+        $blockers['MISSING_PUBLIC_EMAIL'] = 'A valid public contact email is required.';
+    }
+    if (($options['terms_review_state'] ?? '') !== 'approved') {
+        $blockers['TERMS_NOT_APPROVED'] = 'Terms review state is not approved.';
+    }
+    if (!human_option_has_valid_review_date($options, 'terms_review_date')) {
+        $blockers['MISSING_TERMS_REVIEW_DATE'] = 'A valid terms review date is required.';
+    }
+
+    return human_readiness_result($blockers);
+}
+
+function human_get_data_deletion_readiness() {
+    $options = wp_parse_args(get_option('human_options', array()), human_get_default_options());
+    $blockers = array();
+
+    if (!human_option_has_valid_email($options, 'support_contact_email')
+        && !human_option_has_valid_email($options, 'privacy_contact_email')) {
+        $blockers['MISSING_DELETION_CONTACT_EMAIL'] = 'A valid support or privacy deletion contact email is required.';
+    }
+    if (($options['data_deletion_review_state'] ?? '') !== 'approved') {
+        $blockers['DATA_DELETION_NOT_APPROVED'] = 'Data-deletion review state is not approved.';
+    }
+    if (!human_option_has_valid_review_date($options, 'data_deletion_review_date')) {
+        $blockers['MISSING_DATA_DELETION_REVIEW_DATE'] = 'A valid data-deletion review date is required.';
+    }
+    if (($options['deletion_process_review_state'] ?? '') !== 'approved') {
+        $blockers['DELETION_PROCESS_NOT_APPROVED'] = 'Deletion-process review state is not approved.';
+    }
+    if (!human_option_has_valid_review_date($options, 'deletion_process_review_date')) {
+        $blockers['MISSING_DELETION_PROCESS_REVIEW_DATE'] = 'A valid deletion-process review date is required.';
+    }
+    if (($options['android_data_flow_review_state'] ?? '') !== 'approved') {
+        $blockers['ANDROID_FLOW_NOT_APPROVED'] = 'Android data-flow review state is not approved.';
+    }
+
+    return human_readiness_result($blockers);
+}
+
+function human_get_support_readiness() {
+    $options = wp_parse_args(get_option('human_options', array()), human_get_default_options());
+    $blockers = array();
+
+    if (!human_option_has_valid_email($options, 'support_contact_email')) {
+        $blockers['MISSING_SUPPORT_EMAIL'] = 'A valid support contact email is required.';
+    }
+
+    return human_readiness_result($blockers);
+}

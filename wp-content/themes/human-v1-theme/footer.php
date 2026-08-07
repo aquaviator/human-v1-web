@@ -65,16 +65,16 @@ if (!defined('ABSPATH')) {
                         <li><a href="<?php echo esc_url(home_url('/ontology')); ?>">Human Ontology</a></li>
                         <li><a href="<?php echo esc_url(home_url('/journal')); ?>">Human Journal</a></li>
                         <li><a href="<?php echo esc_url(home_url('/about')); ?>">About Platform</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/contact')); ?>">Contact & Media</a></li>
+                        <li><a href="<?php echo esc_url(home_url('/contact/')); ?>">Contact & Media</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4>Support & Legal</h4>
                     <ul>
                         <li><a href="<?php echo esc_url(home_url('/support')); ?>">Customer Support</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/privacy')); ?>">Privacy Policy</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/terms')); ?>">Terms of Service</a></li>
-                        <li><a href="<?php echo esc_url(home_url('/data-deletion')); ?>">Data Deletion</a></li>
+                        <li><a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>">Privacy Policy</a></li>
+                        <li><a href="<?php echo esc_url(home_url('/terms/')); ?>">Terms of Service</a></li>
+                        <li><a href="<?php echo esc_url(home_url('/data-deletion/')); ?>">Data Deletion</a></li>
                     </ul>
                 </div>
                 <?php } ?>
@@ -82,11 +82,11 @@ if (!defined('ABSPATH')) {
         </div>
 
         <div class="footer-bottom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--human-border-dark);">
-            <div>&copy; <?php echo date('Y'); ?> Human Performance Technology. All rights reserved.</div>
+            <div>Human V1 is operated independently.</div>
             <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-                <a href="<?php echo esc_url(home_url('/privacy')); ?>" style="color: #64748B;">Privacy</a>
-                <a href="<?php echo esc_url(home_url('/terms')); ?>" style="color: #64748B;">Terms</a>
-                <a href="<?php echo esc_url(home_url('/data-deletion')); ?>" style="color: #64748B;">Data Deletion</a>
+                <a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>" style="color: #64748B;">Privacy</a>
+                <a href="<?php echo esc_url(home_url('/terms/')); ?>" style="color: #64748B;">Terms</a>
+                <a href="<?php echo esc_url(home_url('/data-deletion/')); ?>" style="color: #64748B;">Data Deletion</a>
             </div>
         </div>
     </div>
