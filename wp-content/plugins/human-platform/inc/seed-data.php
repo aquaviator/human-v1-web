@@ -1736,11 +1736,19 @@ function human_migration_1_5_0() {
         $hello = get_page_by_path('hello-world', OBJECT, 'post');
         if ($hello) {
             $stock_content = 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!';
+            $hello_visible_text = trim((string) preg_replace(
+                '/\s+/u',
+                ' ',
+                html_entity_decode(wp_strip_all_tags((string) $hello->post_content), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+            ));
+            $hello_is_stock = (
+                $hello->post_title === 'Hello world!'
+                && $hello_visible_text === $stock_content
+                && trim($hello->post_excerpt) === ''
+            );
             $intro = human_get_cornerstone_articles()[0];
             $intro_existing = get_page_by_path($intro['slug'], OBJECT, 'post');
-            if ($hello->post_title === 'Hello world!'
-                && trim($hello->post_content) === $stock_content
-                && trim($hello->post_excerpt) === ''
+            if ($hello_is_stock
                 && (!$intro_existing || (int) $intro_existing->ID === (int) $hello->ID)
             ) {
                 $updated = wp_update_post(wp_slash(array(
@@ -1754,11 +1762,7 @@ function human_migration_1_5_0() {
                 if (is_wp_error($updated)) {
                     return $updated;
                 }
-            } elseif ($hello->post_title === 'Hello world!'
-                && trim($hello->post_content) === $stock_content
-                && trim($hello->post_excerpt) === ''
-                && $intro_existing
-            ) {
+            } elseif ($hello_is_stock && $intro_existing) {
                 wp_update_post(array('ID' => $hello->ID, 'post_status' => 'draft'));
                 update_post_meta($hello->ID, '_human_legacy_seed_retired', '1');
             } else {
