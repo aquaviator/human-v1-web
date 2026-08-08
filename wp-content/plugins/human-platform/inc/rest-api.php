@@ -16,6 +16,12 @@ function human_register_rest_routes() {
         'permission_callback' => '__return_true',
     ));
 
+    register_rest_route('human/v1', '/products', array(
+        'methods'  => 'GET',
+        'callback' => 'human_rest_get_products',
+        'permission_callback' => '__return_true',
+    ));
+
     register_rest_route('human/v1', '/ontology/summary', array(
         'methods'  => 'GET',
         'callback' => 'human_rest_get_ontology_summary',
@@ -48,9 +54,24 @@ function human_rest_get_apps() {
     $apps = human_get_canonical_apps();
     return new WP_REST_Response(array(
         'success' => true,
-        'brand' => 'Human V1',
-        'domain' => 'humanv1.com',
+        'brand' => function_exists('human_get_brand_name') ? human_get_brand_name() : 'Human V1',
+        'domain' => function_exists('human_get_canonical_host') ? human_get_canonical_host() : 'humanv1.com',
         'data' => $apps
+    ), 200);
+}
+
+/**
+ * Generic product alias for integrations which should not depend on the
+ * historical /apps naming used by the Human V1 site.
+ */
+function human_rest_get_products() {
+    $products = human_get_canonical_apps();
+    return new WP_REST_Response(array(
+        'success' => true,
+        'contract' => 'digital_product',
+        'brand' => function_exists('human_get_brand_name') ? human_get_brand_name() : 'Human V1',
+        'domain' => function_exists('human_get_canonical_host') ? human_get_canonical_host() : 'humanv1.com',
+        'data' => $products
     ), 200);
 }
 

@@ -243,7 +243,8 @@ function human_run_migrations() {
         '1.2.0' => 'human_migration_1_2_0',
         '1.3.0' => 'human_migration_1_3_0',
         '1.4.0' => 'human_migration_1_4_0',
-        '1.5.0' => 'human_migration_1_5_0'
+        '1.5.0' => 'human_migration_1_5_0',
+        '1.6.0' => 'human_migration_1_6_0'
     );
 
     foreach ($migrations as $version => $callback) {
@@ -1027,6 +1028,10 @@ function human_migration_1_4_0() {
     $required_fields = array(
         'slug',
         'title',
+        'product_type',
+        'distribution_channel',
+        'distribution_url',
+        'external_identifier',
         'current_status',
         'status_label',
         'badge_color',
@@ -1062,7 +1067,7 @@ function human_migration_1_4_0() {
             || array_diff(array_keys($definition), $required_fields)) {
             return new WP_Error(
                 'human_app_definition_shape_invalid',
-                'Every canonical Human app definition must contain the complete 20-field contract.'
+                'Every canonical Human app definition must contain the complete 24-field contract.'
             );
         }
 
@@ -1140,6 +1145,10 @@ function human_migration_1_4_0() {
 
         $conflicts = array();
         $meta_contract = array(
+            'product_type' => '_human_product_type',
+            'distribution_channel' => '_human_distribution_channel',
+            'distribution_url' => '_human_distribution_url',
+            'external_identifier' => '_human_external_identifier',
             'current_status' => '_human_app_status',
             'app_id' => '_human_app_package_id',
             'pricing' => '_human_app_pricing',
@@ -1916,5 +1925,89 @@ function human_migration_1_5_0() {
         return true;
     } finally {
         human_release_content_migration_lock($owner_token);
+    }
+}
+
+/**
+ * Migration 1.6.0: establish generic digital-product portability metadata on
+ * the eight canonical Human V1 products without overwriting editor values.
+ */
+function human_migration_1_6_0() {
+    if (!function_exists('human_get_app_definitions')) {
+        return new WP_Error('human_product_definitions_missing', 'The canonical product definitions are unavailable.');
+    }
+
+    $definitions = human_get_app_definitions();
+    if (!is_array($definitions) || count($definitions) !== 8) {
+        return new WP_Error('human_product_definitions_invalid', 'The canonical Human V1 catalogue must contain exactly eight definitions.');
+    }
+
+    $owner_token = human_acquire_app_migration_lock();
+    if (is_wp_error($owner_token)) {
+        return $owner_token;
+    }
+
+    try {
+        $conflicts = array();
+        $meta_contract = array(
+            'product_type' => '_human_product_type',
+            'distribution_channel' => '_human_distribution_channel',
+            'distribution_url' => '_human_distribution_url',
+            'external_identifier' => '_human_external_identifier',
+        );
+
+        foreach ($definitions as $slug => $definition) {
+            foreach (array_keys($meta_contract) as $required_field) {
+                if (!array_key_exists($required_field, $definition)) {
+                    return new WP_Error(
+                        'human_product_definition_portability_field_missing',
+                        sprintf('Product "%s" is missing portability field "%s".', $slug, $required_field)
+                    );
+                }
+            }
+
+            $matches = human_find_app_ids_by_slug($slug);
+            if (is_wp_error($matches)) {
+                return $matches;
+            }
+            if (count($matches) !== 1) {
+                return new WP_Error(
+                    'human_product_portability_record_missing',
+                    sprintf('Exactly one published Human product record is required for "%s".', $slug),
+                    array('slug' => $slug, 'post_ids' => array_map('intval', $matches))
+                );
+            }
+
+            $post_id = (int) $matches[0];
+            foreach ($meta_contract as $field => $meta_key) {
+                if (!metadata_exists('post', $post_id, $meta_key)) {
+                    $result = human_write_verified_app_meta($post_id, $meta_key, $definition[$field]);
+                    if (is_wp_error($result)) {
+                        return $result;
+                    }
+                    continue;
+                }
+
+                $current = (string) get_post_meta($post_id, $meta_key, true);
+                if ($current !== (string) $definition[$field]) {
+                    human_record_app_migration_conflict(
+                        $conflicts,
+                        $slug,
+                        $field,
+                        $current,
+                        $definition[$field]
+                    );
+                }
+            }
+        }
+
+        update_option('human_product_migration_1_6_0_conflicts', $conflicts, false);
+        if (get_option('human_product_migration_1_6_0_conflicts', null) !== $conflicts) {
+            return new WP_Error('human_product_migration_conflict_write_failed', 'Could not verify the 1.6.0 portability conflict report.');
+        }
+
+        return true;
+    } finally {
+        human_release_app_migration_lock($owner_token);
     }
 }

@@ -80,6 +80,18 @@ function human_render_app_details_meta_box($post) {
     $app_slug = get_post_field('post_name', $post->ID);
     $definitions = human_get_app_definitions();
     $definition = isset($definitions[$app_slug]) ? $definitions[$app_slug] : null;
+    $product_type = metadata_exists('post', $post->ID, '_human_product_type')
+        ? human_normalize_product_type(get_post_meta($post->ID, '_human_product_type', true))
+        : human_normalize_product_type($definition['product_type'] ?? 'other');
+    $distribution_channel = metadata_exists('post', $post->ID, '_human_distribution_channel')
+        ? human_normalize_distribution_channel(get_post_meta($post->ID, '_human_distribution_channel', true))
+        : human_normalize_distribution_channel($definition['distribution_channel'] ?? 'none');
+    $distribution_url = metadata_exists('post', $post->ID, '_human_distribution_url')
+        ? get_post_meta($post->ID, '_human_distribution_url', true)
+        : (string) ($definition['distribution_url'] ?? '');
+    $external_identifier = metadata_exists('post', $post->ID, '_human_external_identifier')
+        ? get_post_meta($post->ID, '_human_external_identifier', true)
+        : (string) ($definition['external_identifier'] ?? '');
     $app_status  = human_normalize_app_status(get_post_meta($post->ID, '_human_app_status', true), $app_slug);
     $package_id  = get_post_meta($post->ID, '_human_app_package_id', true);
     $pricing     = get_post_meta($post->ID, '_human_app_pricing', true);
@@ -109,6 +121,31 @@ function human_render_app_details_meta_box($post) {
                 <option value="paused" <?php selected($app_status, 'paused'); ?>><?php _e('Paused', 'human-platform'); ?></option>
                 <option value="retired" <?php selected($app_status, 'retired'); ?>><?php _e('Retired', 'human-platform'); ?></option>
             </select>
+        </div>
+        <div>
+            <label for="human_product_type"><strong><?php _e('Product Type', 'human-platform'); ?></strong></label>
+            <select id="human_product_type" name="_human_product_type" class="widefat">
+                <?php foreach (human_get_product_types() as $type_key => $type_label): ?>
+                    <option value="<?php echo esc_attr($type_key); ?>" <?php selected($product_type, $type_key); ?>><?php echo esc_html($type_label); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div>
+            <label for="human_distribution_channel"><strong><?php _e('Distribution Channel', 'human-platform'); ?></strong></label>
+            <select id="human_distribution_channel" name="_human_distribution_channel" class="widefat">
+                <?php foreach (human_get_distribution_channels() as $channel_key => $channel_label): ?>
+                    <option value="<?php echo esc_attr($channel_key); ?>" <?php selected($distribution_channel, $channel_key); ?>><?php echo esc_html($channel_label); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div>
+            <label for="human_distribution_url"><strong><?php _e('Distribution URL / Path', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_distribution_url" name="_human_distribution_url" value="<?php echo esc_attr($distribution_url); ?>" class="widefat" placeholder="https://... or /product/">
+            <p class="description"><?php _e('Generic product destination. Google Play keeps strict Store URL validation.', 'human-platform'); ?></p>
+        </div>
+        <div>
+            <label for="human_external_identifier"><strong><?php _e('External Identifier', 'human-platform'); ?></strong></label>
+            <input type="text" id="human_external_identifier" name="_human_external_identifier" value="<?php echo esc_attr($external_identifier); ?>" class="widefat" placeholder="Package ID, SKU, ISBN, product key, etc.">
         </div>
         <div>
             <label for="human_app_package_id"><strong><?php _e('Android Package ID', 'human-platform'); ?></strong></label>
@@ -197,6 +234,46 @@ function human_save_meta_boxes($post_id) {
         $submitted_status = trim((string) wp_unslash($_POST['_human_app_status']));
         if (in_array($submitted_status, human_get_allowed_app_statuses(), true)) {
             update_post_meta($post_id, '_human_app_status', $submitted_status);
+        }
+    }
+
+    if (isset($_POST['_human_product_type'])) {
+        $product_type = sanitize_key(wp_unslash($_POST['_human_product_type']));
+        if (array_key_exists($product_type, human_get_product_types())) {
+            update_post_meta($post_id, '_human_product_type', $product_type);
+        }
+    }
+
+    if (isset($_POST['_human_distribution_channel'])) {
+        $distribution_channel = sanitize_key(wp_unslash($_POST['_human_distribution_channel']));
+        if (array_key_exists($distribution_channel, human_get_distribution_channels())) {
+            update_post_meta($post_id, '_human_distribution_channel', $distribution_channel);
+        }
+    }
+
+    if (isset($_POST['_human_external_identifier'])) {
+        update_post_meta(
+            $post_id,
+            '_human_external_identifier',
+            sanitize_text_field(wp_unslash($_POST['_human_external_identifier']))
+        );
+    }
+
+    if (isset($_POST['_human_distribution_url'])) {
+        $distribution_channel = metadata_exists('post', $post_id, '_human_distribution_channel')
+            ? get_post_meta($post_id, '_human_distribution_channel', true)
+            : 'none';
+        $submitted_distribution_url = trim((string) wp_unslash($_POST['_human_distribution_url']));
+        if ($submitted_distribution_url === '') {
+            update_post_meta($post_id, '_human_distribution_url', '');
+        } else {
+            $validated_distribution_url = human_validate_distribution_url(
+                $submitted_distribution_url,
+                $distribution_channel
+            );
+            if ($validated_distribution_url !== '') {
+                update_post_meta($post_id, '_human_distribution_url', $validated_distribution_url);
+            }
         }
     }
 

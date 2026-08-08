@@ -128,6 +128,151 @@ function human_get_app_status_presentation($status) {
 }
 
 /**
+ * Generic digital product types supported by the marketing engine.
+ *
+ * Human Apps continue to use the existing human_app CPT. These values create
+ * a portability boundary without renaming the established storage contract.
+ */
+function human_get_product_types() {
+    return array(
+        'mobile_app' => 'Mobile App',
+        'wordpress_extension' => 'WordPress Extension',
+        'book' => 'Book / Ebook',
+        'course' => 'Course',
+        'saas' => 'SaaS',
+        'digital_download' => 'Digital Download',
+        'membership' => 'Membership',
+        'other' => 'Other',
+    );
+}
+
+/**
+ * Distribution channels which may be attached to a digital product.
+ */
+function human_get_distribution_channels() {
+    return array(
+        'none' => 'Not Yet Distributed',
+        'google_play' => 'Google Play',
+        'apple_app_store' => 'Apple App Store',
+        'wordpress' => 'WordPress',
+        'direct' => 'Direct',
+        'amazon' => 'Amazon',
+        'woocommerce' => 'WooCommerce',
+        'external' => 'External',
+    );
+}
+
+function human_normalize_product_type($raw_type) {
+    $type = sanitize_key(is_scalar($raw_type) ? (string) $raw_type : '');
+    return array_key_exists($type, human_get_product_types()) ? $type : 'other';
+}
+
+function human_normalize_distribution_channel($raw_channel) {
+    $channel = sanitize_key(is_scalar($raw_channel) ? (string) $raw_channel : '');
+    return array_key_exists($channel, human_get_distribution_channels()) ? $channel : 'none';
+}
+
+/**
+ * Validate a generic distribution destination.
+ *
+ * Google Play keeps its existing strict Store validation. Other channels use
+ * HTTPS destinations; direct and WooCommerce products may also use local paths.
+ */
+function human_validate_distribution_url($url, $channel) {
+    if (!is_string($url) || trim($url) === '') {
+        return '';
+    }
+
+    $channel = human_normalize_distribution_channel($channel);
+    $url = trim($url);
+
+    if ($channel === 'none') {
+        return '';
+    }
+
+    if (($channel === 'direct' || $channel === 'woocommerce')
+        && strpos($url, '/') === 0
+        && strpos($url, '//') !== 0
+    ) {
+        return $url;
+    }
+
+    if ($channel === 'google_play') {
+        return human_validate_google_play_url($url, 'public');
+    }
+
+    $validated = esc_url_raw($url, array('https'));
+    if ($validated === '') {
+        return '';
+    }
+
+    $parts = wp_parse_url($validated);
+    if (!is_array($parts)
+        || strtolower($parts['scheme'] ?? '') !== 'https'
+        || empty($parts['host'])
+        || isset($parts['user'])
+        || isset($parts['pass'])
+        || (isset($parts['port']) && (int) $parts['port'] !== 443)
+    ) {
+        return '';
+    }
+
+    return $validated;
+}
+
+/**
+ * Validate the generic product/distribution contract without imposing Android
+ * requirements on non-Android products.
+ */
+function human_validate_product_portability_contract($product) {
+    $product = is_array($product) ? $product : array();
+    $blockers = array();
+
+    $raw_type = sanitize_key((string) ($product['product_type'] ?? ''));
+    $raw_channel = sanitize_key((string) ($product['distribution_channel'] ?? ''));
+    $type = human_normalize_product_type($raw_type);
+    $channel = human_normalize_distribution_channel($raw_channel);
+    $status = human_normalize_app_status($product['current_status'] ?? '', $product['slug'] ?? '');
+    $external_identifier = trim((string) ($product['external_identifier'] ?? ''));
+    $distribution_url = trim((string) ($product['distribution_url'] ?? ''));
+
+    if ($raw_type === '' || !array_key_exists($raw_type, human_get_product_types())) {
+        $blockers['INVALID_PRODUCT_TYPE'] = 'A supported digital product type is required.';
+    }
+    if ($raw_channel === '' || !array_key_exists($raw_channel, human_get_distribution_channels())) {
+        $blockers['INVALID_DISTRIBUTION_CHANNEL'] = 'A supported distribution channel is required.';
+    }
+
+    if ($channel === 'google_play') {
+        if ($type !== 'mobile_app') {
+            $blockers['GOOGLE_PLAY_REQUIRES_MOBILE_APP'] = 'Google Play distribution is only valid for mobile app products.';
+        }
+        if (!preg_match('/^[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*){1,}$/', $external_identifier)) {
+            $blockers['MISSING_ANDROID_PACKAGE_ID'] = 'Google Play products require a valid Android package identifier.';
+        }
+        if ($status === 'available' && human_validate_distribution_url($distribution_url, $channel) === '') {
+            $blockers['MISSING_PUBLIC_DISTRIBUTION_URL'] = 'Available Google Play products require a valid public Store listing URL.';
+        }
+    }
+
+    if ($channel === 'apple_app_store' && $type !== 'mobile_app') {
+        $blockers['APP_STORE_REQUIRES_MOBILE_APP'] = 'Apple App Store distribution is only valid for mobile app products.';
+    }
+
+    if ($distribution_url !== '' && human_validate_distribution_url($distribution_url, $channel) === '') {
+        $blockers['INVALID_DISTRIBUTION_URL'] = 'The distribution URL is invalid for the selected channel.';
+    }
+
+    return array(
+        'valid' => empty($blockers),
+        'product_type' => $type,
+        'distribution_channel' => $channel,
+        'blocker_codes' => array_keys($blockers),
+        'blocker_messages' => array_values($blockers),
+    );
+}
+
+/**
  * Validate a Google Play destination and return its normalized URL.
  *
  * Public links must be Store listing URLs with a valid Android package ID.
@@ -185,13 +330,17 @@ function human_is_valid_google_play_url($url, $type = 'public') {
 }
 
 /**
- * Canonical App contract. Every record deliberately has the same 20 fields.
+ * Canonical Human product contract. Every seeded record deliberately has the same 24 fields.
  */
 function human_get_app_definitions() {
     return array(
         'strength' => array(
             'slug' => 'strength',
             'title' => 'Human Strength',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'google_play',
+            'distribution_url' => '',
+            'external_identifier' => 'com.aistudio.humanstrength.kfqjza',
             'current_status' => 'internal_testing',
             'status_label' => 'Internal Testing',
             'badge_color' => '#0066FF',
@@ -218,6 +367,10 @@ function human_get_app_definitions() {
         'hiit' => array(
             'slug' => 'hiit',
             'title' => 'Human HIIT',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'future',
             'status_label' => 'Future Product',
             'badge_color' => '#6B7280',
@@ -242,6 +395,10 @@ function human_get_app_definitions() {
         'running' => array(
             'slug' => 'running',
             'title' => 'Human Running',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'future',
             'status_label' => 'Future Product',
             'badge_color' => '#6B7280',
@@ -266,6 +423,10 @@ function human_get_app_definitions() {
         'recovery' => array(
             'slug' => 'recovery',
             'title' => 'Human Recovery',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'future',
             'status_label' => 'Future Product',
             'badge_color' => '#6B7280',
@@ -290,6 +451,10 @@ function human_get_app_definitions() {
         'mobility' => array(
             'slug' => 'mobility',
             'title' => 'Human Mobility',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'future',
             'status_label' => 'Future Product',
             'badge_color' => '#6B7280',
@@ -314,6 +479,10 @@ function human_get_app_definitions() {
         'nutrition' => array(
             'slug' => 'nutrition',
             'title' => 'Human Nutrition',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'future',
             'status_label' => 'Future Product',
             'badge_color' => '#6B7280',
@@ -338,6 +507,10 @@ function human_get_app_definitions() {
         'coach' => array(
             'slug' => 'coach',
             'title' => 'Human Coach',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'coming_soon',
             'status_label' => 'Coming Soon',
             'badge_color' => '#F59E0B',
@@ -362,6 +535,10 @@ function human_get_app_definitions() {
         'community' => array(
             'slug' => 'community',
             'title' => 'Human Community',
+            'product_type' => 'mobile_app',
+            'distribution_channel' => 'none',
+            'distribution_url' => '',
+            'external_identifier' => '',
             'current_status' => 'future',
             'status_label' => 'Future Product',
             'badge_color' => '#6B7280',
@@ -407,6 +584,10 @@ function human_get_canonical_apps() {
             }
 
             $meta_map = array(
+                'product_type' => '_human_product_type',
+                'distribution_channel' => '_human_distribution_channel',
+                'distribution_url' => '_human_distribution_url',
+                'external_identifier' => '_human_external_identifier',
                 'app_id' => '_human_app_package_id',
                 'pricing' => '_human_app_pricing',
                 'price_amount' => '_human_app_price_amount',
@@ -430,6 +611,19 @@ function human_get_canonical_apps() {
                 : $definition['current_status'];
             $app['current_status'] = human_normalize_app_status($raw_status, $slug);
         }
+
+        $app['product_type'] = human_normalize_product_type($app['product_type'] ?? 'mobile_app');
+        $app['distribution_channel'] = human_normalize_distribution_channel($app['distribution_channel'] ?? 'none');
+        if ($app['distribution_channel'] === 'google_play' && empty($app['external_identifier'])) {
+            $app['external_identifier'] = (string) ($app['app_id'] ?? '');
+        }
+        if ($app['distribution_channel'] === 'google_play' && empty($app['distribution_url']) && !empty($app['play_url'])) {
+            $app['distribution_url'] = (string) $app['play_url'];
+        }
+        $app['distribution_url'] = human_validate_distribution_url(
+            (string) ($app['distribution_url'] ?? ''),
+            $app['distribution_channel']
+        );
 
         $presentation = human_get_app_status_presentation($app['current_status']);
         $app['status_label'] = $presentation['label'];
