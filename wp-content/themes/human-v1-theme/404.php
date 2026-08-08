@@ -13,7 +13,7 @@ get_header();
         <span class="eyebrow" style="color: var(--human-error);">404 — PAGE NOT FOUND</span>
         <h1 class="display-title" style="margin: 1rem 0;">Lost Your Training Path?</h1>
         <p style="color: #94A3B8; font-size: 1.05rem; margin-bottom: 2rem; line-height: 1.6;">
-            The page or route you are looking for does not exist on humanv1.com. Explore our core platform modules below.
+            The page or route you are looking for does not exist on <?php echo esc_html(function_exists('human_get_canonical_host') ? human_get_canonical_host() : (wp_parse_url(home_url('/'), PHP_URL_HOST) ?: '')); ?>. Explore our core platform modules below.
         </p>
         <div class="btn-group" style="justify-content: center;">
             <a href="<?php echo esc_url(home_url('/')); ?>" class="btn btn-primary">Return to Homepage</a>

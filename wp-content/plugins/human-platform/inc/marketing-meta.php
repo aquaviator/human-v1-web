@@ -247,7 +247,7 @@ function human_render_marketing_details_meta_box($post) {
                     <div class="human-form-group">
                         <label>Search Preview</label>
                         <div class="human-preview-box search-preview">
-                            <div class="sp-url">humanv1.com &rsaquo; journal &rsaquo; ...</div>
+                            <div class="sp-url"><?php echo esc_html(function_exists('human_get_canonical_host') ? human_get_canonical_host() : (wp_parse_url(home_url('/'), PHP_URL_HOST) ?: '')); ?> &rsaquo; journal &rsaquo; ...</div>
                             <div class="sp-title"><?php echo !empty($seo_title) ? esc_html($seo_title) : '<i>(SEO Title missing)</i>'; ?></div>
                             <div class="sp-desc"><?php echo !empty(get_post_meta($post->ID, '_human_seo_description', true)) ? esc_html(get_post_meta($post->ID, '_human_seo_description', true)) : '<i>(Meta description missing)</i>'; ?></div>
                         </div>
@@ -304,7 +304,7 @@ function human_render_marketing_details_meta_box($post) {
                                 <?php endif; ?>
                             </div>
                             <div style="padding:15px;">
-                                <div style="font-size:12px; color:#65676B; margin-bottom:5px; text-transform:uppercase;">humanv1.com</div>
+                                <div style="font-size:12px; color:#65676B; margin-bottom:5px; text-transform:uppercase;"><?php echo esc_html(function_exists('human_get_canonical_host') ? human_get_canonical_host() : (wp_parse_url(home_url('/'), PHP_URL_HOST) ?: '')); ?></div>
                                 <div style="font-weight:600; font-size:16px; margin-bottom:5px;"><?php echo !empty($social_title) ? esc_html($social_title) : '<i>(Social Title missing)</i>'; ?></div>
                                 <div style="color:#65676B; font-size:14px;"><?php echo !empty($social_desc) ? esc_html($social_desc) : '<i>(Social description missing)</i>'; ?></div>
                             </div>

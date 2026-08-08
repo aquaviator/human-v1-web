@@ -12,14 +12,14 @@ if (!defined('ABSPATH')) {
         <div class="footer-grid">
             <div class="footer-col">
                 <a href="<?php echo esc_url(home_url('/')); ?>" class="brand-logo" style="margin-bottom: 1rem;">
-                    <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/human_logo_master.svg'); ?>" alt="Human V1 Master Logo" style="height: 42px; width: auto; max-width: 220px;">
+                    <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/human_logo_master.svg'); ?>" alt="<?php echo esc_attr(function_exists('human_get_brand_name') ? human_get_brand_name() : (get_bloginfo('name') ?: 'Site')); ?> Logo" style="height: 42px; width: auto; max-width: 220px;">
                 </a>
                 <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 1.5rem; max-width: 320px;">
-                    Train. Track. Transform.<br>
+                    <?php echo esc_html(function_exists('human_get_brand_tagline') ? human_get_brand_tagline() : get_bloginfo('description')); ?><br>
                     A performance technology platform built around real people, structured progression, and long-term human performance.
                 </p>
                 <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #64748B;">
-                    Primary Domain: humanv1.com
+                    Primary Domain: <?php echo esc_html(function_exists('human_get_canonical_host') ? human_get_canonical_host() : (wp_parse_url(home_url('/'), PHP_URL_HOST) ?: '')); ?>
                 </div>
             </div>
 

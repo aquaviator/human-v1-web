@@ -21,8 +21,8 @@ if (!defined('ABSPATH')) {
 <header class="site-header">
     <div class="container header-inner">
         <a href="<?php echo esc_url(home_url('/')); ?>" class="brand-logo">
-            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/hv1-icon.svg'); ?>" alt="Human V1 Icon" style="width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);">
-            <span>Human</span>
+            <img src="<?php echo esc_url(get_template_directory_uri() . '/assets/hv1-icon.svg'); ?>" alt="<?php echo esc_attr(function_exists('human_get_brand_name') ? human_get_brand_name() : (get_bloginfo('name') ?: 'Site')); ?> Icon" style="width: 36px; height: 36px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);">
+            <span><?php echo esc_html(function_exists('human_get_brand_short_name') ? human_get_brand_short_name() : (get_bloginfo('name') ?: 'Site')); ?></span>
         </a>
 
         <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle Navigation Menu">
@@ -48,9 +48,9 @@ if (!defined('ABSPATH')) {
             ?>
             <ul class="main-nav" id="mainNavList">
                 <li><a href="<?php echo esc_url(home_url('/')); ?>">Home</a></li>
-                <li><a href="<?php echo esc_url(home_url('/apps')); ?>">Apps</a></li>
+                <li><a href="<?php echo esc_url(home_url('/apps')); ?>"><?php echo esc_html(function_exists('human_get_catalogue_label') ? human_get_catalogue_label() : 'Apps'); ?></a></li>
                 <li><a href="<?php echo esc_url(home_url('/ontology')); ?>">Human Ontology</a></li>
-                <li><a href="<?php echo esc_url(home_url('/journal')); ?>">Journal</a></li>
+                <li><a href="<?php echo esc_url(home_url('/journal')); ?>"><?php echo esc_html(function_exists('human_get_content_label') ? human_get_content_label() : 'Journal'); ?></a></li>
                 <li><a href="<?php echo esc_url(home_url('/about')); ?>">About</a></li>
                 <li><a href="<?php echo esc_url(home_url('/support')); ?>">Support</a></li>
             </ul>

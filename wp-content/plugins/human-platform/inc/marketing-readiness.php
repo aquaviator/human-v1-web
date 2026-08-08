@@ -444,12 +444,18 @@ function human_get_campaign_readiness($campaign_id) {
             $valid_target = true;
         } else {
             $parts = wp_parse_url($target_url);
-            $valid_target = is_array($parts)
+            $canonical_host = function_exists('human_get_canonical_host') ? human_get_canonical_host() : strtolower((string) (wp_parse_url(home_url('/'), PHP_URL_HOST) ?: ''));
+            $valid_target = $canonical_host !== ''
+                && is_array($parts)
                 && strtolower($parts['scheme'] ?? '') === 'https'
-                && strtolower($parts['host'] ?? '') === 'humanv1.com';
+                && strtolower($parts['host'] ?? '') === $canonical_host;
         }
         if (!$valid_target) {
-            $blockers['INVALID_TARGET_URL'] = 'Campaign target must be a local path or an HTTPS humanv1.com URL.';
+            $canonical_host = function_exists('human_get_canonical_host') ? human_get_canonical_host() : strtolower((string) (wp_parse_url(home_url('/'), PHP_URL_HOST) ?: ''));
+            $blockers['INVALID_TARGET_URL'] = sprintf(
+                'Campaign target must be a local path or an HTTPS %s URL.',
+                $canonical_host
+            );
         }
     }
     if ($utm_source === '' || $utm_medium === '' || $utm_campaign === '') {

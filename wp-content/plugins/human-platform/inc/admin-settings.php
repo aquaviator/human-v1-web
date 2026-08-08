@@ -37,6 +37,8 @@ function human_get_default_options() {
         'umbrella_brand' => 'Human',
         'tagline' => 'Train. Track. Transform.',
         'canonical_domain' => 'https://humanv1.com',
+        'content_label' => 'Journal',
+        'catalogue_label' => 'Apps',
         'default_seo_title' => 'Human V1 | Be the best version of you',
         'default_meta_description' => 'Human V1 is the platform behind Human Strength and future Human applications. Human Strength is currently in Google Play Internal Testing.',
         'support_email' => 'support@humanv1.com',
@@ -72,6 +74,57 @@ function human_get_default_options() {
         'processor_review_state' => 'not_reviewed',
         'processor_review_date' => ''
     );
+}
+
+/**
+ * Canonical brand-shell helpers.
+ *
+ * Human-prefixed function names are intentionally retained for compatibility;
+ * the returned values are configuration-driven so the presentation layer is
+ * not coupled to Human V1 literals.
+ */
+function human_get_brand_name() {
+    $defaults = human_get_default_options();
+    return human_get_option('brand_name', $defaults['brand_name']);
+}
+
+function human_get_brand_short_name() {
+    $defaults = human_get_default_options();
+    return human_get_option('umbrella_brand', $defaults['umbrella_brand']);
+}
+
+function human_get_brand_tagline() {
+    $defaults = human_get_default_options();
+    return human_get_option('tagline', $defaults['tagline']);
+}
+
+function human_get_canonical_domain() {
+    $defaults = human_get_default_options();
+    $configured = human_get_option('canonical_domain', $defaults['canonical_domain']);
+    $parts = wp_parse_url($configured);
+
+    if (!is_array($parts)
+        || strtolower($parts['scheme'] ?? '') !== 'https'
+        || empty($parts['host'])) {
+        return $defaults['canonical_domain'];
+    }
+
+    return rtrim($configured, '/');
+}
+
+function human_get_canonical_host() {
+    $parts = wp_parse_url(human_get_canonical_domain());
+    return is_array($parts) && !empty($parts['host']) ? strtolower($parts['host']) : 'humanv1.com';
+}
+
+function human_get_content_label() {
+    $defaults = human_get_default_options();
+    return human_get_option('content_label', $defaults['content_label']);
+}
+
+function human_get_catalogue_label() {
+    $defaults = human_get_default_options();
+    return human_get_option('catalogue_label', $defaults['catalogue_label']);
 }
 
 function human_validate_review_date($value) {
@@ -200,7 +253,7 @@ function human_render_settings_page() {
         </div>
         <?php endif; ?>
 
-        <p><?php _e('Central configuration for brand details, Google Play integration, SEO defaults, and marketing options across humanv1.com.', 'human-platform'); ?></p>
+        <p><?php echo esc_html(sprintf(__('Central configuration for brand details, Google Play integration, SEO defaults, and marketing options across %s.', 'human-platform'), human_get_canonical_host())); ?></p>
 
         <form method="post" action="options.php">
             <?php
@@ -302,12 +355,24 @@ function human_render_settings_page() {
                     <td><input name="human_options[brand_name]" type="text" id="brand_name" value="<?php echo esc_attr($options['brand_name']); ?>" class="regular-text"></td>
                 </tr>
                 <tr>
+                    <th scope="row"><label for="umbrella_brand"><?php _e('Brand Short Name', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[umbrella_brand]" type="text" id="umbrella_brand" value="<?php echo esc_attr($options['umbrella_brand']); ?>" class="regular-text"></td>
+                </tr>
+                <tr>
                     <th scope="row"><label for="tagline"><?php _e('Brand Tagline', 'human-platform'); ?></label></th>
                     <td><input name="human_options[tagline]" type="text" id="tagline" value="<?php echo esc_attr($options['tagline']); ?>" class="regular-text"></td>
                 </tr>
                 <tr>
                     <th scope="row"><label for="canonical_domain"><?php _e('Canonical Domain URL', 'human-platform'); ?></label></th>
                     <td><input name="human_options[canonical_domain]" type="url" id="canonical_domain" value="<?php echo esc_attr($options['canonical_domain']); ?>" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="content_label"><?php _e('Content Section Label', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[content_label]" type="text" id="content_label" value="<?php echo esc_attr($options['content_label']); ?>" class="regular-text"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="catalogue_label"><?php _e('Catalogue Label', 'human-platform'); ?></label></th>
+                    <td><input name="human_options[catalogue_label]" type="text" id="catalogue_label" value="<?php echo esc_attr($options['catalogue_label']); ?>" class="regular-text"></td>
                 </tr>
                 <tr>
                     <th scope="row"><label for="default_seo_title"><?php _e('Default SEO Title', 'human-platform'); ?></label></th>

@@ -12,13 +12,13 @@ function human_get_breadcrumbs() {
     
     // Always start with Home
     $breadcrumbs[] = array(
-        'title' => 'Human',
+        'title' => function_exists('human_get_brand_short_name') ? human_get_brand_short_name() : (get_bloginfo('name') ?: 'Home'),
         'url' => home_url('/')
     );
 
     if (is_home() || is_category() || is_tag() || is_singular('post')) {
         $breadcrumbs[] = array(
-            'title' => 'Journal',
+            'title' => function_exists('human_get_content_label') ? human_get_content_label() : 'Journal',
             'url' => home_url('/journal/')
         );
         
@@ -66,12 +66,12 @@ function human_get_breadcrumbs() {
         }
     } elseif (is_post_type_archive('human_app') || is_page('apps')) {
         $breadcrumbs[] = array(
-            'title' => 'Apps',
+            'title' => function_exists('human_get_catalogue_label') ? human_get_catalogue_label() : 'Apps',
             'url' => home_url('/apps/')
         );
     } elseif (is_singular('human_app')) {
         $breadcrumbs[] = array(
-            'title' => 'Apps',
+            'title' => function_exists('human_get_catalogue_label') ? human_get_catalogue_label() : 'Apps',
             'url' => home_url('/apps/')
         );
         $breadcrumbs[] = array(
